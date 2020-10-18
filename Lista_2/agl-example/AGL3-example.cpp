@@ -3,10 +3,11 @@
 //
 // Ver.3  14.I.2020 (c) A. Łukaszewski
 // ==========================================================================
-// AGL3 example usage 
+// AGL3 example usage
 //===========================================================================
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
@@ -14,12 +15,15 @@
 // ==========================================================================
 // Drawable object: no-data only: vertex/fragment programs
 // ==========================================================================
-class MyTri : public AGLDrawable {
+class MyTri : public AGLDrawable
+{
 public:
-   MyTri() : AGLDrawable(0) {
+   MyTri() : AGLDrawable(0)
+   {
       setShaders();
    }
-   void setShaders() {
+   void setShaders()
+   {
       compileShaders(R"END(
 
          #version 330 
@@ -36,7 +40,8 @@ public:
             gl_Position = vec4(vertices[gl_VertexID], 0.5, 1.0); 
          }
 
-      )END", R"END(
+      )END",
+                     R"END(
 
          #version 330 
          in  vec4 vcolor;
@@ -48,23 +53,113 @@ public:
 
       )END");
    }
-   void draw() {
+   void draw()
+   {
       bindProgram();
       glDrawArrays(GL_TRIANGLES, 0, 3);
    }
 };
 
+class MyCircle : public AGLDrawable
+{
+
+   int N = 20;
+   int r = 2;
+
+public:
+   MyCircle() : AGLDrawable(0)
+   {
+      setShaders();
+      setBuffers();
+   }
+   void setShaders()
+   {
+      compileShaders(R"END(
+         #version 330 
+         #extension GL_ARB_explicit_uniform_location : require
+         #extension GL_ARB_shading_language_420pack : require
+         layout(location = 0) in vec2 pos;
+         layout(location = 0) uniform float scale;
+         layout(location = 1) uniform vec2  center;
+         out vec4 vtex;
+
+         void main(void) {
+            vec2 p = (pos * scale + center);
+            gl_Position = vec4(p, 0.0, 1.0);
+         }
+      )END",
+                     R"END(
+         #version 330 
+         #extension GL_ARB_explicit_uniform_location : require
+         layout(location = 3) uniform vec3  cross_color;
+         out vec4 color;
+
+         void main(void) {
+            color = vec4(cross_color,1.0);
+         } 
+      )END");
+   }
+
+   void setBuffers()
+   {
+      bindBuffers();
+      GLfloat x[N];
+      GLfloat y[N];
+
+      GLfloat circle_verts[N][2]; // circle verts;
+
+      for (int i = 0; i < N; i++)
+      {
+         circle_verts[i][0] = r * cos(2 * M_PI * i / N); //x[n] = r * cos(2 * pi * n / N)
+         circle_verts[i][1] = r * sin(2 * M_PI * i / N); //y[n] = r * sin(2 * pi * n / N);
+      }
+
+      glBufferData(GL_ARRAY_BUFFER, N * 2 * sizeof(GLfloat), circle_verts, GL_STATIC_DRAW);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(
+          0,        // attribute 0, must match the layout in the shader.
+          2,        // size
+          GL_FLOAT, // type
+          GL_FALSE, // normalized?
+          0,        //24,             // stride
+          (void *)0 // array buffer offset
+      );
+   }
+
+   void draw(float tx, float ty)
+   {
+      bindProgram();
+      bindBuffers();
+      glUniform1f(0, 1.0 / 16); // scale  in vertex shader ZMIANA?
+      glUniform2f(1, tx, ty);   // center in vertex shader ZMIANA?
+      glUniform3f(3, circle_color[0], circle_color[1], circle_color[2]);
+
+      glDrawArrays(GL_LINE_LOOP, 0, N); //ZMIANA?
+   }
+   void setColor(float r, float g, float b)
+   {
+      circle_color[0] = r;
+      circle_color[1] = g;
+      circle_color[2] = b;
+   }
+
+private:
+   GLfloat circle_color[3] = {0.0, 0.0, 1.0};
+};
 
 // ==========================================================================
 // Drawable object with some data in buffer and vertex/fragment programs
 // ==========================================================================
-class MyCross : public AGLDrawable {
+class MyCross : public AGLDrawable
+{
 public:
-   MyCross() : AGLDrawable(0) {
+   MyCross() : AGLDrawable(0)
+   {
       setShaders();
       setBuffers();
    }
-   void setShaders() {
+   void setShaders()
+   {
       compileShaders(R"END(
 
          #version 330 
@@ -80,7 +175,8 @@ public:
             gl_Position = vec4(p, 0.0, 1.0);
          }
 
-      )END", R"END(
+      )END",
+                     R"END(
 
          #version 330 
          #extension GL_ARB_explicit_uniform_location : require
@@ -93,105 +189,157 @@ public:
 
       )END");
    }
-   void setBuffers() {
+   void setBuffers()
+   {
       bindBuffers();
-      GLfloat vert[4][2] = {  // Cross lines
-         { -1,  0  },
-         {  1,  0  },
-         {  0, -1  },
-         {  0,  1  }
-      };
+      GLfloat vert[4][2] = {// Cross lines
+                            {-1, 0},
+                            {1, 0},
+                            {0, -1},
+                            {0, 1}};
 
-      glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(float), vert, GL_STATIC_DRAW );
+      glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
       glEnableVertexAttribArray(0);
       glVertexAttribPointer(
-         0,                 // attribute 0, must match the layout in the shader.
-         2,                  // size
-         GL_FLOAT,           // type
-         GL_FALSE,           // normalized?
-         0,//24,             // stride
-         (void*)0            // array buffer offset
+          0,        // attribute 0, must match the layout in the shader.
+          2,        // size
+          GL_FLOAT, // type
+          GL_FALSE, // normalized?
+          0,        //24,             // stride
+          (void *)0 // array buffer offset
       );
    }
-   void draw(float tx, float ty) {
+   void draw(float tx, float ty)
+   {
       bindProgram();
       bindBuffers();
-      glUniform1f(0, 1.0/16);  // scale  in vertex shader
-      glUniform2f(1, tx, ty);  // center in vertex shader
-      glUniform3f(3, cross_color[0],cross_color[1],cross_color[2]);
+      glUniform1f(0, 1.0 / 16); // scale  in vertex shader
+      glUniform2f(1, tx, ty);   // center in vertex shader
+      glUniform3f(3, cross_color[0], cross_color[1], cross_color[2]);
 
       glDrawArrays(GL_LINES, 0, 4);
    }
-   void setColor(float r, float g, float b){
-      cross_color[0]=r;cross_color[1]=g;cross_color[2]=b;
+   void setColor(float r, float g, float b)
+   {
+      cross_color[0] = r;
+      cross_color[1] = g;
+      cross_color[2] = b;
    }
- private:
-   GLfloat cross_color[3] = { 0.0, 1.0, 0.0 };
-};
 
+private:
+   GLfloat cross_color[3] = {0.0, 1.0, 0.0};
+};
 
 // ==========================================================================
 // Window Main Loop Inits ...................................................
 // ==========================================================================
-class MyWin : public AGLWindow {
+class MyWin : public AGLWindow // MYWin dziedziczy po AGLWindow
+{
 public:
-    MyWin() {};
-    MyWin(int _wd, int _ht, const char *name, int vers, int fullscr=0)
-        : AGLWindow(_wd, _ht, name, vers, fullscr) {};
-    virtual void KeyCB(int key, int scancode, int action, int mods);
-    void MainLoop();
+   MyWin(){}; // to jest konstruktor bez argumentów
+   MyWin(int _wd, int _ht, const char *name, int vers, int fullscr = 0)
+       : AGLWindow(_wd, _ht, name, vers, fullscr){};
+   // to jest konstruktor z argumentami, dziedziczacy po  AGLWindow
+   virtual void KeyCB(int key, int scancode, int action, int mods);
+   // to jest deklaracja wirtualnej (nadpisywalnej w dziedziczeniu) funkcji klasy.
+   void MainLoop(); // deklaracja funkcji, ktora pozniej zostanie uzupelniona
 };
 
-
 // ==========================================================================
-void MyWin::KeyCB(int key, int scancode, int action, int mods) {
-    AGLWindow::KeyCB(key,scancode, action, mods); // f-key full screen switch
-    if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS) {
-       ; // do something
-    }
-    if (key == GLFW_KEY_HOME  && (action == GLFW_PRESS)) {
-       ; // do something
-    }
+// to wlasnie jest cialo funkcji MyWin, ktora wczesniej jest zadeklarowana jako funkcja wirtualna
+void MyWin::KeyCB(int key, int scancode, int action, int mods)
+{
+   AGLWindow::KeyCB(key, scancode, action, mods); // f-key full screen switch
+   if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS)
+   {
+      printf("to spacja\n");
+      ; // do something
+   }
+   if (key == GLFW_KEY_H && (action == GLFW_PRESS))
+   {
+      printf("a to home?\n");
+      ; // do something
+   }
 }
 
-
 // ==========================================================================
-void MyWin::MainLoop() {
-   ViewportOne(0,0,wd,ht);
+void MyWin::MainLoop()
+{
+   ViewportOne(0, 0, wd, ht);
 
    MyCross cross;
-   MyTri   trian;
+   MyTri trian;
+   MyCircle circle;
 
-   float   tx=0.0, ty=0.5;
-   do {
-      glClear( GL_COLOR_BUFFER_BIT );
-   
+   float tx = 0.0, ty = 0.5;
+   float cx = 0.0, cy = 0.5;
+   do
+   {
+      glClear(GL_COLOR_BUFFER_BIT);
+
       AGLErrors("main-loopbegin");
       // =====================================================        Drawing
       trian.draw();
-      cross.draw(tx,ty);
+      cross.draw(tx, ty);
+      circle.draw(cx, cy);
       AGLErrors("main-afterdraw");
 
       glfwSwapBuffers(win()); // =============================   Swap buffers
       glfwPollEvents();
-      //glfwWaitEvents();   
+      //glfwWaitEvents();
 
-      if (glfwGetKey(win(), GLFW_KEY_DOWN ) == GLFW_PRESS) {
+      if (glfwGetKey(win(), GLFW_KEY_K) == GLFW_PRESS)
+      {
          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      } else if (glfwGetKey(win(), GLFW_KEY_UP ) == GLFW_PRESS) {
-         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      } else if (glfwGetKey(win(), GLFW_KEY_RIGHT ) == GLFW_PRESS) {
-         tx += 0.01;
-      } else if (glfwGetKey(win(), GLFW_KEY_LEFT ) == GLFW_PRESS) {
-         tx -= 0.01;
+         printf("Klawisz K (dol)\n");
       }
-   } while( glfwGetKey(win(), GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-            glfwWindowShouldClose(win()) == 0 );
+      else if (glfwGetKey(win(), GLFW_KEY_I) == GLFW_PRESS)
+      {
+         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         printf("Klawisz I (gora)\n");
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_L) == GLFW_PRESS)
+      {
+         tx += 0.01;
+         printf("Klawisz L (prawo)\n");
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_J) == GLFW_PRESS)
+      {
+         tx -= 0.01;
+         printf("Klawisz J (lewo)\n");
+      }
+
+      else if (glfwGetKey(win(), GLFW_KEY_S) == GLFW_PRESS)
+      {
+         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+         cy -= 0.01;
+         printf("Klawisz S (dol)\n");
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_W) == GLFW_PRESS)
+      {
+         // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         cy += 0.01;
+         printf("Klawisz W (gora)\n");
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_D) == GLFW_PRESS)
+      {
+         cx += 0.01;
+         printf("Klawisz D (prawo)\n");
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_A) == GLFW_PRESS)
+      {
+         cx -= 0.01;
+         printf("Klawisz A (lewo)\n");
+      }
+
+   } while (glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
+            glfwWindowShouldClose(win()) == 0);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
    MyWin win;
-   win.Init(800,600,"AGL3 example",0,33);
+   win.Init(800, 600, "AGL3 example", 0, 33);
    win.MainLoop();
    return 0;
 }

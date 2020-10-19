@@ -13,7 +13,7 @@
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
 
-const int N = 20;
+const int N = 180;
 const int r = 2;
 // ==========================================================================
 // Drawable object: no-data only: vertex/fragment programs
@@ -98,17 +98,19 @@ public:
 
          void main(void) {
             vec2 p = (pos * scale + center);
+            // gl_Position = vec4(p, 0.0, 1.0);
             gl_Position = vec4(p, 0.0, 1.0);
+            // vtex = 0.5 * p + 0.5;
          }
       )END",
                      R"END(
          #version 330 
          #extension GL_ARB_explicit_uniform_location : require
-         layout(location = 3) uniform vec3  cross_color;
+         layout(location = 3) uniform vec3  circle_color;
          out vec4 color;
 
          void main(void) {
-            color = vec4(cross_color,1.0);
+            color = vec4(circle_color,1.0);
          } 
       )END");
    }
@@ -123,8 +125,8 @@ public:
 
       for (int i = 0; i < N; i++)
       {
-         circle_verts[i][0] = r * cos(2 * M_PI * i / N); //x[n] = r * cos(2 * pi * n / N)
-         circle_verts[i][1] = r * sin(2 * M_PI * i / N); //y[n] = r * sin(2 * pi * n / N);
+         circle_verts[i][0] = r * cos((2 * M_PI * i / N) + 0);  //x[n] = r * cos(2 * pi * n / N)
+         circle_verts[i][1] = -r * sin((2 * M_PI * i / N) + 0); //y[n] = r * sin(2 * pi * n / N);
       }
 
       glBufferData(GL_ARRAY_BUFFER, N * 2 * sizeof(GLfloat), circle_verts, GL_STATIC_DRAW);
@@ -134,7 +136,7 @@ public:
           2,        // size
           GL_FLOAT, // type
           GL_FALSE, // normalized?
-          0,        //24,             // stride
+          0,        // 24,             // stride
           (void *)0 // array buffer offset
       );
    }
@@ -143,11 +145,11 @@ public:
    {
       bindProgram();
       bindBuffers();
-      glUniform1f(0, 1.0 / 16); // scale  in vertex shader ZMIANA?
+      glUniform1f(0, 1.0 / 16); // scale  in vertex shader ZMIANA? rozmiar kolka
       glUniform2f(1, tx, ty);   // center in vertex shader ZMIANA?
       glUniform3f(3, circle_color[0], circle_color[1], circle_color[2]);
 
-      glDrawArrays(GL_LINE_LOOP, 0, N); //ZMIANA?
+      glDrawArrays(GL_LINE_LOOP, 0, N);
    }
    void setColor(float r, float g, float b)
    {
@@ -345,7 +347,7 @@ void MyWin::MainLoop()
 int main(int argc, char *argv[])
 {
    MyWin win;
-   win.Init(800, 600, "AGL3 example", 0, 33);
+   win.Init(800, 800, "AGL3 example", 0, 33);
    win.MainLoop();
    return 0;
 }

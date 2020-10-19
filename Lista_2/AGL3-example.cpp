@@ -265,12 +265,10 @@ void MyWin::KeyCB(int key, int scancode, int action, int mods)
    AGLWindow::KeyCB(key, scancode, action, mods); // f-key full screen switch
    if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS)
    {
-      printf("to spacja\n");
       ; // do something
    }
    if (key == GLFW_KEY_H && (action == GLFW_PRESS))
    {
-      printf("a to home?\n");
       ; // do something
    }
 }
@@ -299,50 +297,39 @@ void MyWin::MainLoop()
 
       glfwSwapBuffers(win()); // =============================   Swap buffers
       glfwPollEvents();
-      //glfwWaitEvents();
 
       if (glfwGetKey(win(), GLFW_KEY_K) == GLFW_PRESS)
       {
          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-         printf("Klawisz K (dol)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_I) == GLFW_PRESS)
       {
          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-         printf("Klawisz I (gora)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_L) == GLFW_PRESS)
       {
          tx += 0.01;
-         printf("Klawisz L (prawo)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_J) == GLFW_PRESS)
       {
          tx -= 0.01;
-         printf("Klawisz J (lewo)\n");
       }
 
       else if (glfwGetKey(win(), GLFW_KEY_S) == GLFW_PRESS)
       {
-         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
          cy -= 0.01;
-         printf("Klawisz S (dol)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_W) == GLFW_PRESS)
       {
-         // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
          cy += 0.01;
-         printf("Klawisz W (gora)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_D) == GLFW_PRESS)
       {
          cx += 0.01;
-         printf("Klawisz D (prawo)\n");
       }
       else if (glfwGetKey(win(), GLFW_KEY_A) == GLFW_PRESS)
       {
          cx -= 0.01;
-         printf("Klawisz A (lewo)\n");
       }
 
       if ((abs(ty - cy) * abs(ty - cy)) + (abs(tx - cx) * abs(tx - cx)) <= 0.175 * 0.175)

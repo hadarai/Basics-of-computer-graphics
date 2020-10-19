@@ -30,18 +30,22 @@ public:
       compileShaders(R"END(
 
          #version 330 
-         // in vec2 pos
          out vec4 vcolor;
+         out vec2 pos;
          void main(void) {
-            const vec2 vertices[3] = vec2[3](vec2( 0.9, -0.9),
-                                             vec2(-0.9, -0.9),
-                                             vec2( 0.9,  0.9));
-            const vec4 colors[]    = vec4[3](vec4(1.0, 0.0, 0.0, 1.0),
-                                             vec4(0.0, 1.0, 0.0, 1.0),
-                                             vec4(0.0, 0.0, 1.0, 1.0));
+            const vec2 vertices[3] = // to sa wspolrzedne wierzcholkow trojkata
+               vec2[3](vec2( 0.9, -0.9), 
+                       vec2(-0.9, -0.9),
+                       vec2( 0.9,  0.9));
+
+            const vec4 colors[] = // a to jakies wspolrzene kolorow?
+               vec4[3](vec4(1.0, 0.0, 0.0, 1.0),
+                       vec4(0.0, 1.0, 0.0, 1.0),
+                       vec4(0.0, 0.0, 1.0, 1.0));
 
             vcolor      = colors[gl_VertexID];
             gl_Position = vec4(vertices[gl_VertexID], 0.5, 1.0); 
+            pos = vertices[gl_VertexID];
          }
 
       )END",
@@ -49,10 +53,18 @@ public:
 
          #version 330 
          in  vec4 vcolor;
+         in  vec2 pos;
          out vec4 color;
 
          void main(void) {
-            color = vcolor;
+            if((pos.x * pos.x + pos.y * pos.y) < (0.1 * 0.1))
+            {
+               color = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+            else
+            {
+               color = vcolor;
+            }
          } 
 
       )END");

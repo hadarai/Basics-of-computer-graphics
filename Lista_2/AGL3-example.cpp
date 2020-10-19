@@ -337,7 +337,6 @@ void MyWin::MainLoop()
          printf("Game over.\n");
          break;
       }
-      // printf("Pozycja krzyzyka: (%f, %f), pozycja srodka kola: (%f, %f).\n", tx, ty, cx, cy);
 
    } while ((glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
              glfwWindowShouldClose(win()) == 0));

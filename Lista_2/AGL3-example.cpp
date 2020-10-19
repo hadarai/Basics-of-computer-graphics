@@ -8,10 +8,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <cstdlib>
 
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
 
+const int N = 20;
+const int r = 2;
 // ==========================================================================
 // Drawable object: no-data only: vertex/fragment programs
 // ==========================================================================
@@ -27,6 +30,7 @@ public:
       compileShaders(R"END(
 
          #version 330 
+         // in vec2 pos
          out vec4 vcolor;
          void main(void) {
             const vec2 vertices[3] = vec2[3](vec2( 0.9, -0.9),
@@ -62,9 +66,6 @@ public:
 
 class MyCircle : public AGLDrawable
 {
-
-   int N = 20;
-   int r = 2;
 
 public:
    MyCircle() : AGLDrawable(0)
@@ -271,7 +272,7 @@ void MyWin::MainLoop()
    MyTri trian;
    MyCircle circle;
 
-   float tx = 0.0, ty = 0.5;
+   float tx = 0.0, ty = 0.0;
    float cx = 0.0, cy = 0.5;
    do
    {
@@ -332,8 +333,15 @@ void MyWin::MainLoop()
          printf("Klawisz A (lewo)\n");
       }
 
-   } while (glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
-            glfwWindowShouldClose(win()) == 0);
+      if ((abs(ty - cy) * abs(ty - cy)) + (abs(tx - cx) * abs(tx - cx)) <= 0.175 * 0.175)
+      {
+         printf("Game over.\n");
+         break;
+      }
+      // printf("Pozycja krzyzyka: (%f, %f), pozycja srodka kola: (%f, %f).\n", tx, ty, cx, cy);
+
+   } while ((glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
+             glfwWindowShouldClose(win()) == 0));
 }
 
 int main(int argc, char *argv[])

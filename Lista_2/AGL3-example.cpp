@@ -98,9 +98,7 @@ public:
 
          void main(void) {
             vec2 p = (pos * scale + center);
-            // gl_Position = vec4(p, 0.0, 1.0);
-            gl_Position = vec4(p, 0.0, 1.0);
-            // vtex = 0.5 * p + 0.5;
+            gl_Position = vec4(p, 0.0, 1.0);x
          }
       )END",
                      R"END(

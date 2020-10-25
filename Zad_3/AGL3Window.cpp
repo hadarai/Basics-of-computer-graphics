@@ -17,9 +17,11 @@ using namespace std;
 
 void AGLErrors(const char *comment)
 {
-   GLenum er;
-   while (er = glGetError())
-      fprintf(stderr, "\nOpenGL ERROR: 0x%04x    =============%s===\n", er, comment);
+   GLenum err;
+   while ((err = glGetError()) != GL_NO_ERROR)
+   {
+      fprintf(stderr, "\nOpenGL ERROR: 0x%04x    ===%s===\n", err, comment);
+   }
 }
 
 AGLWindow::~AGLWindow()

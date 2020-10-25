@@ -106,29 +106,39 @@ private:
          glDeleteShader(g);
       return Result;
    }
-   GLint CompileLink(GLuint v, const char *which, int prog = 0)
+   GLint CompileLink(GLuint vertex_shader_id, const char *which, int prog = 0)
    {
+      // tu zrobiłem zmianę v -> vertex_shader_id.
+      // Być może niesłusznie, bo to nie musi być vertex shader, ale wcześniej bylo v i to sugerowało jeszcze mniej
       GLint Result = GL_FALSE;
       int InfoLogLength;
       if (prog)
       {
-         glLinkProgram(v);
-         glGetProgramiv(v, GL_LINK_STATUS, &Result);
-         glGetProgramiv(v, GL_INFO_LOG_LENGTH, &InfoLogLength);
+         glLinkProgram(vertex_shader_id);
+         glGetProgramiv(vertex_shader_id, GL_LINK_STATUS, &Result);
+         glGetProgramiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &InfoLogLength);
       }
       else
       {
-         glCompileShader(v);
-         glGetShaderiv(v, GL_COMPILE_STATUS, &Result);
-         glGetShaderiv(v, GL_INFO_LOG_LENGTH, &InfoLogLength);
+         glCompileShader(vertex_shader_id);
+
+         glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &Result);
+         glGetShaderiv(vertex_shader_id, GL_INFO_LOG_LENGTH, &InfoLogLength);
       }
+      //my shit added - it's a vertex shader check:
+      // if (InfoLogLength > 0)
+      // {
+      //    std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+      //    glGetShaderInfoLog(vertex_shader_id, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+      //    printf("%s\n", &VertexShaderErrorMessage[0]);
+      // }
       if (InfoLogLength > 0 && !Result)
       {
          std::vector<char> Message(InfoLogLength + 1);
          if (prog)
-            glGetProgramInfoLog(v, InfoLogLength, NULL, &Message[0]);
+            glGetProgramInfoLog(vertex_shader_id, InfoLogLength, NULL, &Message[0]);
          else
-            glGetShaderInfoLog(v, InfoLogLength, NULL, &Message[0]);
+            glGetShaderInfoLog(vertex_shader_id, InfoLogLength, NULL, &Message[0]);
          printf("%s: %s\n", which, &Message[0]);
       }
       return Result;

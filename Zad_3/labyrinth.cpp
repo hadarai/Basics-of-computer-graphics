@@ -7,6 +7,12 @@
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// #include <glm/gtx/matrix_transform_2d.hpp>
+
 class BackgroundSqare : public AGLDrawable
 {
 public:
@@ -21,21 +27,12 @@ public:
          #version 330 
          out vec4 vcolor;
          void main(void) {
-            // const vec2 vertices[3] = // to sa wspolrzedne wierzcholkow trojkata
-            //    vec2[3](vec2( 0.9, -0.9), 
-            //            vec2(-0.9, -0.9),
-            //            vec2( 0.9,  0.9));
 
             const vec2 vertices[4] = // to sa wspolrzedne wierzcholkow trojkata
                vec2[4](vec2(-0.9, -0.9),
                        vec2( 0.9, -0.9),                       
                        vec2(-0.9,  0.9),
                        vec2( 0.9,  0.9));
-
-            // const vec4 colors[] = // a to jakies wspolrzene kolorow?
-            //    vec4[3](vec4(1.0, 0.0, 0.0, 1.0),
-            //            vec4(0.0, 1.0, 0.0, 1.0),
-            //            vec4(0.0, 0.0, 1.0, 1.0));
 
             const vec4 colors[4] = // a to jakies wspolrzene kolorow?
                vec4[4](vec4(0.0, 0.0, 0.0, 1.0),
@@ -68,10 +65,10 @@ public:
    }
 };
 
-class PlayerLine : public AGLDrawable
+class EnemyLine : public AGLDrawable
 {
 public:
-   PlayerLine() : AGLDrawable(0)
+   EnemyLine() : AGLDrawable(0)
    {
       setShaders();
       setBuffers();
@@ -86,10 +83,12 @@ public:
          layout(location = 0) uniform float scale;
          layout(location = 1) uniform vec2  center;
          out vec4 vtex;
-
+         // out vec4 vcolor;
+         
          void main(void) {
             vec2 p = (pos * scale + center);
             gl_Position = vec4(p, 0.0, 1.0);
+            // To z internetu: gl_Position = trans * vec4(position, 0.0, 1.0);
          }
 
       )END",
@@ -97,19 +96,23 @@ public:
          #version 330 
          #extension GL_ARB_explicit_uniform_location : require
          layout(location = 3) uniform vec3  cross_color;
+         // in vec4 vcolor;
          out vec4 color;
 
          void main(void) {
             color = vec4(cross_color,1.0);
+            
+            // color = vcolor
          } 
       )END");
    }
    void setBuffers()
    {
       bindBuffers();
+      float angle = 0.234;  //kat w radianach, wiec z przedziału 0.0-2.0
       GLfloat vert[4][2] = {// Cross lines
-                            {-1, 0},
-                            {1, 0}};
+                            {-cos(angle * M_PI), -sin(angle * M_PI)},
+                            {cos(angle * M_PI), sin(angle * M_PI)}};
 
       glBufferData(GL_ARRAY_BUFFER, 2 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
       glEnableVertexAttribArray(0);
@@ -132,12 +135,108 @@ public:
 
       glDrawArrays(GL_LINES, 0, 2);
    }
-   // void setColor(float r, float g, float b)
-   // {
-   //    cross_color[0] = r;
-   //    cross_color[1] = g;
-   //    cross_color[2] = b;
-   // }
+   void setColor(float r, float g, float b)
+   {
+      cross_color[0] = r;
+      cross_color[1] = g;
+      cross_color[2] = b;
+   }
+
+private:
+   GLfloat cross_color[3] = {1.0, 0.0, 0.0};
+};
+
+class PlayerLine : public AGLDrawable
+{
+public:
+   PlayerLine() : AGLDrawable(0)
+   {
+      setShaders();
+      setBuffers();
+   }
+   void setShaders()
+   {
+      compileShaders(R"END(
+         #version 330 
+         #extension GL_ARB_explicit_uniform_location : require
+         #extension GL_ARB_shading_language_420pack : require
+         layout(location = 0) in vec2 pos;
+         layout(location = 0) uniform float scale;
+         layout(location = 1) uniform vec2  center;
+         out vec4 vtex;
+         // out vec4 vcolor;
+         layout(location = 4) uniform mat4 trans;
+         
+         void main(void) {
+            // const vec4 colors[] = vec4[2](vec4(1.0, 0.0, 0.0, 1.0),
+            //                               vec4(0.0, 1.0, 0.0, 1.0));
+            
+            vec2 p = (pos * scale + center);
+            gl_Position = trans * vec4(p, 0.0, 1.0);
+            // To z internetu: gl_Position = trans * vec4(position, 0.0, 1.0);
+         }
+
+      )END",
+                     R"END(
+         #version 330 
+         #extension GL_ARB_explicit_uniform_location : require
+         layout(location = 3) uniform vec3  cross_color;
+         // in vec4 vcolor;
+         out vec4 color;
+
+         void main(void) {
+            color = vec4(cross_color,1.0);
+            
+            // color = vcolor
+         } 
+      )END");
+   }
+   void setBuffers()
+   {
+      bindBuffers();
+      GLfloat vert[4][2] = {// Cross lines
+                            {-1, 0},
+                            {1, 0}};
+
+      glBufferData(GL_ARRAY_BUFFER, 2 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(
+          0,        // attribute 0, must match the layout in the shader.
+          2,        // size
+          GL_FLOAT, // type
+          GL_FALSE, // normalized?
+          0,        //24,             // stride
+          (void *)0 // array buffer offset
+      );
+   }
+   void draw(float tx, float ty, float angle)
+   {
+      bindProgram();
+      bindBuffers();
+      glUniform1f(0, 1.0 / 16); // scale  in vertex shader
+      glUniform2f(1, tx, ty);   // center in vertex shader
+      glUniform3f(3, cross_color[0], cross_color[1], cross_color[2]);
+      // glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f))));
+
+      glm::mat4 trans = glm::mat4(1.0f);
+      trans = glm::rotate(
+          trans,                        //model
+          angle + glm::radians(0.0f),   //angle in radians (angle in degrees deprecated)
+          glm::vec3(0.0f, 0.0f, 1.0f)); //axis of rotation (vector of rotation?)
+
+      // // glm::vec4 result = trans * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+      // // printf("%f, %f, %f\n", result.x, result.y, result.z);
+
+      glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(trans));
+
+      glDrawArrays(GL_LINES, 0, 2);
+   }
+   void setColor(float r, float g, float b)
+   {
+      cross_color[0] = r;
+      cross_color[1] = g;
+      cross_color[2] = b;
+   }
 
 private:
    GLfloat cross_color[3] = {0.0, 1.0, 0.0};
@@ -179,9 +278,10 @@ void MyWin::MainLoop()
    ViewportOne(0, 0, wd, ht);
 
    PlayerLine player;
+   EnemyLine sample_enemy;
    BackgroundSqare background;
 
-   float tx = 0.0, ty = 0.0;
+   float tx = 0.0, ty = 0.0, player_angle = 45.0;
    do
    {
       glClear(GL_COLOR_BUFFER_BIT);
@@ -189,28 +289,29 @@ void MyWin::MainLoop()
       AGLErrors("main-loopbegin");
       // =====================================================        Drawing
       background.draw();
-      player.draw(tx, ty);
+      player.draw(tx, ty, player_angle);
+      sample_enemy.draw(0.5f, 0.5f);
 
       AGLErrors("main-afterdraw");
 
       glfwSwapBuffers(win()); // =============================   Swap buffers
       glfwPollEvents();
 
-      if (glfwGetKey(win(), GLFW_KEY_K) == GLFW_PRESS)
-      {
-         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      }
-      else if (glfwGetKey(win(), GLFW_KEY_I) == GLFW_PRESS)
-      {
-         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      }
-      else if (glfwGetKey(win(), GLFW_KEY_L) == GLFW_PRESS)
+      if (glfwGetKey(win(), GLFW_KEY_W) == GLFW_PRESS)
       {
          tx += 0.01;
       }
-      else if (glfwGetKey(win(), GLFW_KEY_J) == GLFW_PRESS)
+      else if (glfwGetKey(win(), GLFW_KEY_S) == GLFW_PRESS)
       {
          tx -= 0.01;
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_A) == GLFW_PRESS)
+      {
+         player_angle -= 0.01;
+      }
+      else if (glfwGetKey(win(), GLFW_KEY_D) == GLFW_PRESS)
+      {
+         player_angle += 0.01;
       }
 
    } while ((glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&

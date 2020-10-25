@@ -38,7 +38,7 @@ public:
                        vec2(-0.9, -0.9),
                        vec2( 0.9,  0.9));
 
-            const vec4 colors[] = // a to jakies wspolrzene kolorow?
+            const vec4 colors[] = // a to jakies wspolrzedne kolorow?
                vec4[3](vec4(1.0, 0.0, 0.0, 1.0),
                        vec4(0.0, 1.0, 0.0, 1.0),
                        vec4(0.0, 0.0, 1.0, 1.0));

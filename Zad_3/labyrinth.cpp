@@ -11,59 +11,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// #include <glm/gtx/matrix_transform_2d.hpp>
-
-class BackgroundSqare : public AGLDrawable
-{
-public:
-   BackgroundSqare() : AGLDrawable(0)
-   {
-      setShaders();
-   }
-   void setShaders()
-   {
-      compileShaders(R"END(
-
-         #version 330 
-         out vec4 vcolor;
-         void main(void) {
-
-            const vec2 vertices[4] = // to sa wspolrzedne wierzcholkow trojkata
-               vec2[4](vec2(-0.9, -0.9),
-                       vec2( 0.9, -0.9),                       
-                       vec2(-0.9,  0.9),
-                       vec2( 0.9,  0.9));
-
-            const vec4 colors[4] = // a to jakies wspolrzene kolorow?
-               vec4[4](vec4(0.0, 0.0, 0.0, 1.0),
-                       vec4(1.0, 0.0, 0.0, 1.0),
-                       vec4(0.0, 0.0, 1.0, 1.0),
-                       vec4(0.0, 1.0, 0.0, 1.0));
-
-            vcolor      = colors[gl_VertexID];
-            gl_Position = vec4(vertices[gl_VertexID], 0.5, 1.0); 
-         }
-
-      )END",
-                     R"END(
-
-         #version 330 
-         in  vec4 vcolor;
-         out vec4 color;
-
-         void main(void) {
-            color = vcolor;
-         } 
-
-      )END");
-   }
-   void draw()
-   {
-      bindProgram();
-      glDrawArrays(GL_TRIANGLES, 0, 3);
-      glDrawArrays(GL_TRIANGLES, 1, 3);
-   }
-};
+#include "BackgroundSquare.hpp"
+#include "PlayerLine.hpp"
 
 class EnemyLine : public AGLDrawable
 {
@@ -111,8 +60,8 @@ public:
       bindBuffers();
       float angle = 0.234;  //kat w radianach, wiec z przedziału 0.0-2.0
       GLfloat vert[4][2] = {// Cross lines
-                            {-cos(angle * M_PI), -sin(angle * M_PI)},
-                            {cos(angle * M_PI), sin(angle * M_PI)}};
+                            {(GLfloat)-cos(angle * M_PI), (GLfloat)-sin(angle * M_PI)},
+                            {(GLfloat)cos(angle * M_PI), (GLfloat)sin(angle * M_PI)}};
 
       glBufferData(GL_ARRAY_BUFFER, 2 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
       glEnableVertexAttribArray(0);
@@ -135,111 +84,15 @@ public:
 
       glDrawArrays(GL_LINES, 0, 2);
    }
-   void setColor(float r, float g, float b)
-   {
-      cross_color[0] = r;
-      cross_color[1] = g;
-      cross_color[2] = b;
-   }
+   // void setColor(float r, float g, float b)
+   // {
+   //    cross_color[0] = r;
+   //    cross_color[1] = g;
+   //    cross_color[2] = b;
+   // }
 
 private:
    GLfloat cross_color[3] = {1.0, 0.0, 0.0};
-};
-
-class PlayerLine : public AGLDrawable
-{
-public:
-   PlayerLine() : AGLDrawable(0)
-   {
-      setShaders();
-      setBuffers();
-   }
-   void setShaders()
-   {
-      compileShaders(R"END(
-         #version 330 
-         #extension GL_ARB_explicit_uniform_location : require
-         #extension GL_ARB_shading_language_420pack : require
-         layout(location = 0) in vec2 pos;
-         layout(location = 0) uniform float scale;
-         layout(location = 1) uniform vec2  center;
-         out vec4 vtex;
-         // out vec4 vcolor;
-         layout(location = 4) uniform mat4 trans;
-         
-         void main(void) {
-            // const vec4 colors[] = vec4[2](vec4(1.0, 0.0, 0.0, 1.0),
-            //                               vec4(0.0, 1.0, 0.0, 1.0));
-            
-            vec2 p = (pos * scale + center);
-            gl_Position = trans * vec4(p, 0.0, 1.0);
-            // To z internetu: gl_Position = trans * vec4(position, 0.0, 1.0);
-         }
-
-      )END",
-                     R"END(
-         #version 330 
-         #extension GL_ARB_explicit_uniform_location : require
-         layout(location = 3) uniform vec3  cross_color;
-         // in vec4 vcolor;
-         out vec4 color;
-
-         void main(void) {
-            color = vec4(cross_color,1.0);
-            
-            // color = vcolor
-         } 
-      )END");
-   }
-   void setBuffers()
-   {
-      bindBuffers();
-      GLfloat vert[4][2] = {// Cross lines
-                            {-1, 0},
-                            {1, 0}};
-
-      glBufferData(GL_ARRAY_BUFFER, 2 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(
-          0,        // attribute 0, must match the layout in the shader.
-          2,        // size
-          GL_FLOAT, // type
-          GL_FALSE, // normalized?
-          0,        //24,             // stride
-          (void *)0 // array buffer offset
-      );
-   }
-   void draw(float tx, float ty, float angle)
-   {
-      bindProgram();
-      bindBuffers();
-      glUniform1f(0, 1.0 / 16); // scale  in vertex shader
-      glUniform2f(1, tx, ty);   // center in vertex shader
-      glUniform3f(3, cross_color[0], cross_color[1], cross_color[2]);
-      // glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f))));
-
-      glm::mat4 trans = glm::mat4(1.0f);
-      trans = glm::rotate(
-          trans,                        //model
-          angle + glm::radians(0.0f),   //angle in radians (angle in degrees deprecated)
-          glm::vec3(0.0f, 0.0f, 1.0f)); //axis of rotation (vector of rotation?)
-
-      // // glm::vec4 result = trans * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-      // // printf("%f, %f, %f\n", result.x, result.y, result.z);
-
-      glUniformMatrix4fv(4, 1, GL_FALSE, glm::value_ptr(trans));
-
-      glDrawArrays(GL_LINES, 0, 2);
-   }
-   void setColor(float r, float g, float b)
-   {
-      cross_color[0] = r;
-      cross_color[1] = g;
-      cross_color[2] = b;
-   }
-
-private:
-   GLfloat cross_color[3] = {0.0, 1.0, 0.0};
 };
 
 // ==========================================================================
@@ -282,6 +135,10 @@ void MyWin::MainLoop()
    BackgroundSqare background;
 
    float tx = 0.0, ty = 0.0, player_angle = 45.0;
+   float screen_space = 1.8f;
+   int amount_of_x_fragmentation = 10;
+   GLfloat enemy_position_X, enemy_position_Y;
+
    do
    {
       glClear(GL_COLOR_BUFFER_BIT);
@@ -290,7 +147,13 @@ void MyWin::MainLoop()
       // =====================================================        Drawing
       background.draw();
       player.draw(tx, ty, player_angle);
-      sample_enemy.draw(0.5f, 0.5f);
+      for (int i = 0; i < amount_of_x_fragmentation; i++)
+      {
+         enemy_position_X = -0.9 + (screen_space / amount_of_x_fragmentation) * i;
+         enemy_position_Y = -0.9f;
+         // printf("%f %f\n", enemy_position_X, enemy_position_Y);
+         sample_enemy.draw(enemy_position_X, enemy_position_Y);
+      }
 
       AGLErrors("main-afterdraw");
 

@@ -116,12 +116,12 @@ void MyWin::MainLoop()
    {
       for (int j = 0; j < amount_of_rows; j++)
       {
-         enemy_rotations[i][j] = rand() % 180 + 1;
+         enemies[i][j].angle_in_degrees = rand() % 180 + 1;
       }
    }
+   start = glfwGetTime();
    do
    {
-      // start = clock();
 
       glClear(GL_COLOR_BUFFER_BIT);
 
@@ -133,10 +133,9 @@ void MyWin::MainLoop()
 
       for (int column = 1; column < amount_of_columns; column++)
       {
-         enemy_position_X = -0.9f + (0.2) * column;
-         enemy_position_Y = -0.9f;
-
-         enemies[0][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[0][column]);
+         enemies[0][column].x = -0.9f + (0.2) * column;
+         enemies[0][column].y = -0.9f;
+         enemies[0][column].draw();
       }
 
       //drawing everything in the middle
@@ -144,19 +143,17 @@ void MyWin::MainLoop()
       {
          for (int column = 0; column < amount_of_columns; column++)
          {
-            enemy_position_X = -0.9f + 0.2 * column;
-            enemy_position_Y = -0.9f + 0.2 * row;
-
-            enemies[row][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[row][column]);
+            enemies[row][column].x = -0.9f + 0.2 * column;
+            enemies[row][column].y = -0.9f + 0.2 * row;
+            enemies[row][column].draw();
          }
       }
       //drawing last row
       for (int column = 0; column < amount_of_columns - 1; column++)
       {
-         enemy_position_X = -0.9 + 0.2 * column;
-         enemy_position_Y = 0.9f;
-
-         enemies[amount_of_rows - 1][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[amount_of_rows - 1][column]);
+         enemies[amount_of_rows - 1][column].x = -0.9 + 0.2 * column;
+         enemies[amount_of_rows - 1][column].y = 0.9f;
+         enemies[amount_of_rows - 1][column].draw();
       }
       finish.draw(finish_position_x, finish_position_y, finish_rotation_angle);
 
@@ -165,6 +162,7 @@ void MyWin::MainLoop()
       glfwSwapBuffers(win()); // =============================   Swap buffers
       glfwPollEvents();
 
+      // =====================================================   Detect events
       if (glfwGetKey(win(), GLFW_KEY_W) == GLFW_PRESS)
       {
          player_position_x += player_movement * cos(player_rotation_angle * M_PI / 180);
@@ -174,7 +172,6 @@ void MyWin::MainLoop()
       {
          player_position_x -= player_movement * cos(player_rotation_angle * M_PI / 180);
          player_position_y -= player_movement * sin(player_rotation_angle * M_PI / 180);
-         // player_position_x -= 0.01;
       }
       else if (glfwGetKey(win(), GLFW_KEY_A) == GLFW_PRESS)
       {
@@ -185,7 +182,7 @@ void MyWin::MainLoop()
          player_rotation_angle -= 0.5;
       }
 
-      //detect collision
+      // =====================================================    Detect collisions
 
       for (int i = 0; i < amount_of_rows; i++)
       {
@@ -196,9 +193,9 @@ void MyWin::MainLoop()
                                 player_rotation_angle,
                                 enemies[i][j].x,
                                 enemies[i][j].y,
-                                enemies[i][j].angle))
+                                enemies[i][j].angle_in_degrees))
             {
-               printf("GAME OVER\n");
+               printf("GAME OVER\nTime in game: %fs\n", (glfwGetTime() - start));
                exit(EXIT_FAILURE);
             }
          }
@@ -211,7 +208,7 @@ void MyWin::MainLoop()
                           finish_position_y,
                           finish_rotation_angle))
       {
-         printf("CONGRATULATIONS!\n");
+         printf("CONGRATULATIONS!\nTime in game: %fs\n", (glfwGetTime() - start));
          exit(EXIT_SUCCESS);
       }
 

@@ -32,6 +32,7 @@ public:
    float ViewportOne(int _vtx, int _vty, int _vwd, int _vht); //store vp, return aspect
    void GetCursorNDC(float *x, float *y);                     // mouse position VpOne
 
+   // void framebuffer_size_callback(GLFWwindow window, int width, int height);
    // Handles key 'f' for switching fullscreen mode:
    virtual void Resize(int _wd, int _ht); // Sets Win:wd,ht,aspec +glViewp
    virtual void KeyCB(int key, int scancode, int action, int mods);

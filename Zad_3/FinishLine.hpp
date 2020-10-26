@@ -1,8 +1,8 @@
 
-class PlayerLine : public AGLDrawable
+class FinishLine : public AGLDrawable
 {
 public:
-    PlayerLine() : AGLDrawable(0)
+    FinishLine() : AGLDrawable(0)
     {
         setShaders();
         setBuffers();
@@ -40,8 +40,8 @@ public:
             
             gl_Position = vec4(p, 0.0, 1.0);
 
-            const vec4 colors[] = vec4[2](vec4(1.0, 0.0, 1.0, 1.0),
-                                          vec4(0.0, 0.0, 1.0, 1.0));
+            const vec4 colors[] = vec4[2](vec4(1.0, 1.0, 0.0, 1.0),
+                                          vec4(0.5, 0.0, 1.0, 1.0));
             vcolor = colors[gl_VertexID];
          }
 

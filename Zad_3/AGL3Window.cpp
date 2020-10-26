@@ -93,7 +93,7 @@ void AGLWindow::WaitForFixedFPS(float frame_time)
 {
    double wait_time = frame_time - (glfwGetTime() - prev_time);
    if (wait_time > 0.0)
-      usleep(1000000 * wait_time); //before swapBuf.. and time sync 60Hz..
+      usleep(wait_time); //before swapBuf.. and time sync 60Hz..
    prev_time = glfwGetTime();
 }
 

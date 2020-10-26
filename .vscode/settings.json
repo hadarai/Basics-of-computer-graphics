@@ -2,6 +2,7 @@
     "files.associations": {
         "*.vertexshader": "go",
         "*.fragmentshader": "glsl",
-        "random": "cpp"
+        "random": "cpp",
+        "algorithm": "cpp"
     }
 }

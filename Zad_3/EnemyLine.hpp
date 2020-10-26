@@ -2,6 +2,10 @@
 class EnemyLine : public AGLDrawable
 {
 public:
+    float x = 0.0;
+    float y = 0.0;
+    float angle = 0.0;
+
     EnemyLine() : AGLDrawable(0)
     {
         setShaders();
@@ -89,7 +93,9 @@ public:
         glUniform1f(0, 1.0 / 10); // scale  in vertex shader - tu można coś zmienić by były większe
         glUniform2f(1, tx, ty);   // line_center in vertex shader - a tu nwm co
         glUniform1f(2, rotation_angle_in_degrees);
-
+        x = tx;
+        y = ty;
+        angle = rotation_angle_in_degrees;
         glDrawArrays(GL_LINES, 0, 2);
     }
 

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <time.h>
+// #include <Boolean>
 
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
@@ -17,6 +18,36 @@
 #include "PlayerLine.hpp"
 #include "EnemyLine.hpp"
 #include "FinishLine.hpp"
+
+bool lineLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+{
+
+   // calculate the distance to intersection point
+   float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+   float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+
+   // if uA and uB are between 0-1, lines are colliding
+   return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
+}
+
+bool collision_check(float player_x, float player_y, float player_angle, float something_x, float something_y, float something_angle)
+{
+   const float scale = 1.0 / 10;
+   //player_x, player_y, player_angle
+
+   float player_x1 = (cos(player_angle * M_PI / 180) * scale) + player_x,
+         player_y1 = (sin(player_angle * M_PI / 180) * scale) + player_y,
+         player_x2 = (-cos(player_angle * M_PI / 180) * scale) + player_x,
+         player_y2 = (-sin(player_angle * M_PI / 180) * scale) + player_y;
+
+   float something_x1 = (cos(something_angle * M_PI / 180) * scale) + something_x,
+         something_y1 = (sin(something_angle * M_PI / 180) * scale) + something_y,
+         something_x2 = (-cos(something_angle * M_PI / 180) * scale) + something_x,
+         something_y2 = (-sin(something_angle * M_PI / 180) * scale) + something_y;
+
+   return (lineLine(player_x1, player_y1, player_x2, player_y2,
+                    something_x1, something_y1, something_x2, something_y2));
+}
 
 // ==========================================================================
 // Window Main Loop Inits ...................................................
@@ -72,6 +103,7 @@ void MyWin::MainLoop()
    BackgroundSqare background;
 
    float player_position_x = -0.9f, player_position_y = -0.9f, player_rotation_angle = 45.0;
+   float finish_position_x = 0.9f, finish_position_y = 0.9f, finish_rotation_angle = 45.0;
    float screen_space = 1.8f;
    int amount_of_columns = 10, amount_of_rows = 10;
    GLfloat enemy_position_X, enemy_position_Y;
@@ -126,7 +158,7 @@ void MyWin::MainLoop()
 
          enemies[amount_of_rows - 1][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[amount_of_rows - 1][column]);
       }
-      finish.draw(0.9, 0.9, 45.0);
+      finish.draw(finish_position_x, finish_position_y, finish_rotation_angle);
 
       AGLErrors("main-afterdraw");
 
@@ -153,41 +185,35 @@ void MyWin::MainLoop()
          player_rotation_angle -= 0.5;
       }
 
-      // collision checking
-      // // The main function that returns true if line segment 'p1q1'
-      // // and 'p2q2' intersect.
-      // bool doIntersect(Point p1, Point q1, Point p2, Point q2)
-      // {
-      //    // Find the four orientations needed for general and
-      //    // special cases
-      //    int o1 = orientation(p1, q1, p2);
-      //    int o2 = orientation(p1, q1, q2);
-      //    int o3 = orientation(p2, q2, p1);
-      //    int o4 = orientation(p2, q2, q1);
+      //detect collision
 
-      //    // General case
-      //    if (o1 != o2 && o3 != o4)
-      //       return true;
+      for (int i = 0; i < amount_of_rows; i++)
+      {
+         for (int j = 0; j < amount_of_columns; j++)
+         {
+            if (collision_check(player_position_x,
+                                player_position_y,
+                                player_rotation_angle,
+                                enemies[i][j].x,
+                                enemies[i][j].y,
+                                enemies[i][j].angle))
+            {
+               printf("GAME OVER\n");
+               exit(EXIT_FAILURE);
+            }
+         }
+      }
 
-      //    // Special Cases
-      //    // p1, q1 and p2 are colinear and p2 lies on segment p1q1
-      //    if (o1 == 0 && onSegment(p1, p2, q1))
-      //       return true;
-
-      //    // p1, q1 and q2 are colinear and q2 lies on segment p1q1
-      //    if (o2 == 0 && onSegment(p1, q2, q1))
-      //       return true;
-
-      //    // p2, q2 and p1 are colinear and p1 lies on segment p2q2
-      //    if (o3 == 0 && onSegment(p2, p1, q2))
-      //       return true;
-
-      //    // p2, q2 and q1 are colinear and q1 lies on segment p2q2
-      //    if (o4 == 0 && onSegment(p2, q1, q2))
-      //       return true;
-
-      //    return false; // Doesn't fall in any of the above cases
-      // }
+      if (collision_check(player_position_x,
+                          player_position_y,
+                          player_rotation_angle,
+                          finish_position_x,
+                          finish_position_y,
+                          finish_rotation_angle))
+      {
+         printf("CONGRATULATIONS!\n");
+         exit(EXIT_SUCCESS);
+      }
 
       // duration = (clock() - start) / (double)CLOCKS_PER_SEC;
       // usleep(1000 / 144 - duration);

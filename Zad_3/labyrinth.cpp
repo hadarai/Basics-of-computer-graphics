@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <cstdlib>
+#include <unistd.h>
+#include <time.h>
 
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
@@ -30,38 +32,61 @@ public:
          #extension GL_ARB_shading_language_420pack : require
          layout(location = 0) in vec2 pos;
          layout(location = 0) uniform float scale;
-         layout(location = 1) uniform vec2  center;
+         layout(location = 1) uniform vec2  line_center;
+         layout(location = 2) uniform float rotation_angle_in_degrees;
          out vec4 vtex;
-         // out vec4 vcolor;
+         out vec4 vcolor;
+         
          
          void main(void) {
-            vec2 p = (pos * scale + center);
+            
+            vec2 circle_vector = vec2(0.0, 0.0);
+            if(gl_VertexID%2 == 0)
+            {
+               // rysuje ten z przodu
+               
+               float rotation_angle_in_radians = radians(rotation_angle_in_degrees);
+               circle_vector.x = cos(rotation_angle_in_radians);
+               circle_vector.y = sin(rotation_angle_in_radians);
+            }
+            else if(gl_VertexID%2 == 1)
+            {
+               // rysuje ten z tylu
+               float rotation_angle_in_radians = radians(rotation_angle_in_degrees);
+               circle_vector.x = -cos(rotation_angle_in_radians);
+               circle_vector.y = -sin(rotation_angle_in_radians);
+            }
+            
+            vec2 p = ((circle_vector * scale) + line_center);
+            
             gl_Position = vec4(p, 0.0, 1.0);
-            // To z internetu: gl_Position = trans * vec4(position, 0.0, 1.0);
+
+            const vec4 colors[] = vec4[2](vec4(1.0, 0.0, 0.0, 1.0),
+                                          vec4(0.0, 1.0, 0.0, 1.0));
+            vcolor = colors[gl_VertexID];
          }
 
       )END",
                      R"END(
          #version 330 
-         #extension GL_ARB_explicit_uniform_location : require
-         layout(location = 3) uniform vec3  cross_color;
-         // in vec4 vcolor;
+         
+         in vec4 vcolor;
          out vec4 color;
 
          void main(void) {
-            color = vec4(cross_color,1.0);
             
-            // color = vcolor
+            color = vcolor;
          } 
       )END");
    }
    void setBuffers()
    {
       bindBuffers();
-      float angle = 0.234;  //kat w radianach, wiec z przedziału 0.0-2.0
-      GLfloat vert[4][2] = {// Cross lines
-                            {(GLfloat)-cos(angle * M_PI), (GLfloat)-sin(angle * M_PI)},
-                            {(GLfloat)cos(angle * M_PI), (GLfloat)sin(angle * M_PI)}};
+      float angle = 0.234; //kat w radianach, wiec z przedziału 0.0-2.0
+      float some_scale = 1.7f;
+
+      GLfloat vert[4][2] = {{0.0, 0.0},
+                            {0.0, 0.0}};
 
       glBufferData(GL_ARRAY_BUFFER, 2 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
       glEnableVertexAttribArray(0);
@@ -70,29 +95,23 @@ public:
           2,        // size
           GL_FLOAT, // type
           GL_FALSE, // normalized?
-          0,        //24,             // stride
+          0,        // 24,             // stride
           (void *)0 // array buffer offset
       );
    }
-   void draw(float tx, float ty)
+   void draw(float tx, float ty, float rotation_angle_in_degrees)
    {
       bindProgram();
       bindBuffers();
-      glUniform1f(0, 1.0 / 16); // scale  in vertex shader
-      glUniform2f(1, tx, ty);   // center in vertex shader
-      glUniform3f(3, cross_color[0], cross_color[1], cross_color[2]);
+      glUniform1f(0, 1.0 / 10); // scale  in vertex shader - tu można coś zmienić by były większe
+      glUniform2f(1, tx, ty);   // line_center in vertex shader - a tu nwm co
+      glUniform1f(2, rotation_angle_in_degrees);
 
       glDrawArrays(GL_LINES, 0, 2);
    }
-   // void setColor(float r, float g, float b)
-   // {
-   //    cross_color[0] = r;
-   //    cross_color[1] = g;
-   //    cross_color[2] = b;
-   // }
 
 private:
-   GLfloat cross_color[3] = {1.0, 0.0, 0.0};
+   // kind of something
 };
 
 // ==========================================================================
@@ -115,44 +134,79 @@ public:
 void MyWin::KeyCB(int key, int scancode, int action, int mods)
 {
    AGLWindow::KeyCB(key, scancode, action, mods); // f-key full screen switch
-   if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS)
-   {
-      ; // do something
-   }
-   if (key == GLFW_KEY_H && (action == GLFW_PRESS))
-   {
-      ; // do something
-   }
+   // if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS)
+   // {
+   //    ; // do something
+   // }
+   // if (key == GLFW_KEY_H && (action == GLFW_PRESS))
+   // {
+   //    ; // do something
+   // }
 }
 
 // ==========================================================================
 void MyWin::MainLoop()
 {
    ViewportOne(0, 0, wd, ht);
+   clock_t start;
+   double duration;
 
    PlayerLine player;
-   EnemyLine sample_enemy;
+   EnemyLine enemies[10][10]; // wrogowie na wspolrzednych 0,0 i 9,9 nie sa rysowani jak cos
    BackgroundSqare background;
 
-   float tx = 0.0, ty = 0.0, player_angle = 45.0;
+   float player_position_x = -0.9f, player_position_y = -0.9f, player_rotation_angle = 0.0;
    float screen_space = 1.8f;
-   int amount_of_x_fragmentation = 10;
+   int amount_of_columns = 10, amount_of_rows = 10;
    GLfloat enemy_position_X, enemy_position_Y;
+   float enemy_rotation = rand() % 180 + 1;
+   float player_movement = 0.005;
 
+   for (int i = 0; i < amount_of_columns; i++)
+   {
+      for (int j = 0; j < amount_of_rows; j++)
+      {
+      }
+   }
    do
    {
+      start = clock();
+
       glClear(GL_COLOR_BUFFER_BIT);
 
       AGLErrors("main-loopbegin");
       // =====================================================        Drawing
       background.draw();
-      player.draw(tx, ty, player_angle);
-      for (int i = 0; i < amount_of_x_fragmentation; i++)
+      //drawing lowest row
+      player.draw(player_position_x, player_position_y, player_rotation_angle);
+
+      // enemies[0][1].draw(0.6, 0.6, enemy_rotation);
+      for (int column = 1; column < amount_of_columns; column++)
       {
-         enemy_position_X = -0.9 + (screen_space / amount_of_x_fragmentation) * i;
+         enemy_position_X = -0.9f + (0.2) * column;
          enemy_position_Y = -0.9f;
-         // printf("%f %f\n", enemy_position_X, enemy_position_Y);
-         sample_enemy.draw(enemy_position_X, enemy_position_Y);
+
+         enemies[0][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
+      }
+
+      //drawing everything in the middle
+      for (int row = 1; row < amount_of_rows - 1; row++)
+      {
+         for (int column = 0; column < amount_of_columns; column++)
+         {
+            enemy_position_X = -0.9f + 0.2 * column;
+            enemy_position_Y = -0.9f + 0.2 * row;
+
+            enemies[row][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
+         }
+      }
+      //drawing last row
+      for (int column = 0; column < amount_of_columns - 1; column++)
+      {
+         enemy_position_X = -0.9 + 0.2 * column;
+         enemy_position_Y = 0.9f;
+
+         enemies[amount_of_rows - 1][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
       }
 
       AGLErrors("main-afterdraw");
@@ -162,27 +216,81 @@ void MyWin::MainLoop()
 
       if (glfwGetKey(win(), GLFW_KEY_W) == GLFW_PRESS)
       {
-         tx += 0.01;
+         player_position_x += player_movement * cos(player_rotation_angle * M_PI / 180);
+         player_position_y += player_movement * sin(player_rotation_angle * M_PI / 180);
       }
       else if (glfwGetKey(win(), GLFW_KEY_S) == GLFW_PRESS)
       {
-         tx -= 0.01;
+         player_position_x -= player_movement * cos(player_rotation_angle * M_PI / 180);
+         player_position_y -= player_movement * sin(player_rotation_angle * M_PI / 180);
+         // player_position_x -= 0.01;
       }
       else if (glfwGetKey(win(), GLFW_KEY_A) == GLFW_PRESS)
       {
-         player_angle -= 0.01;
+         player_rotation_angle -= 0.5;
       }
       else if (glfwGetKey(win(), GLFW_KEY_D) == GLFW_PRESS)
       {
-         player_angle += 0.01;
+         player_rotation_angle += 0.5;
       }
 
+      // collision checking
+      // // The main function that returns true if line segment 'p1q1'
+      // // and 'p2q2' intersect.
+      // bool doIntersect(Point p1, Point q1, Point p2, Point q2)
+      // {
+      //    // Find the four orientations needed for general and
+      //    // special cases
+      //    int o1 = orientation(p1, q1, p2);
+      //    int o2 = orientation(p1, q1, q2);
+      //    int o3 = orientation(p2, q2, p1);
+      //    int o4 = orientation(p2, q2, q1);
+
+      //    // General case
+      //    if (o1 != o2 && o3 != o4)
+      //       return true;
+
+      //    // Special Cases
+      //    // p1, q1 and p2 are colinear and p2 lies on segment p1q1
+      //    if (o1 == 0 && onSegment(p1, p2, q1))
+      //       return true;
+
+      //    // p1, q1 and q2 are colinear and q2 lies on segment p1q1
+      //    if (o2 == 0 && onSegment(p1, q2, q1))
+      //       return true;
+
+      //    // p2, q2 and p1 are colinear and p1 lies on segment p2q2
+      //    if (o3 == 0 && onSegment(p2, p1, q2))
+      //       return true;
+
+      //    // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+      //    if (o4 == 0 && onSegment(p2, q1, q2))
+      //       return true;
+
+      //    return false; // Doesn't fall in any of the above cases
+      // }
+
+      duration = (clock() - start) / (double)CLOCKS_PER_SEC;
+      usleep(1000 / 144 - duration);
    } while ((glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
              glfwWindowShouldClose(win()) == 0));
 }
 
 int main(int argc, char *argv[])
 {
+   int seed = time(NULL);
+
+   if (argc < 2)
+   {
+      printf("Assuming seed: %d\n", seed);
+   }
+   else
+   {
+      seed = atoi(argv[1]);
+      printf("Given seed: %d\n", seed);
+   }
+
+   srand(seed);
    MyWin win;
    win.Init(800, 800, "labyrinth", 0, 33);
    win.MainLoop();

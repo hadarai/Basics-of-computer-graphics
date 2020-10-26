@@ -90,7 +90,7 @@ private:
       GLint Result = GL_FALSE;
       if (g)
          Result = CompileLink(g, "GS");
-      if (Result = CompileLink(v, "VS"))
+      if ((Result = CompileLink(v, "VS")))
          if (CompileLink(f, "FS"))
          {
             pId = glCreateProgram();

@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <time.h>
-// #include <Boolean>
 
 #include <AGL3Window.hpp>
 #include <AGL3Drawable.hpp>
@@ -21,19 +20,14 @@
 
 bool lineLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-
-   // calculate the distance to intersection point
    float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
    float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
-
-   // if uA and uB are between 0-1, lines are colliding
    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
 }
 
 bool collision_check(float player_x, float player_y, float player_angle, float something_x, float something_y, float something_angle)
 {
    const float scale = 1.0 / 10;
-   //player_x, player_y, player_angle
 
    float player_x1 = (cos(player_angle * M_PI / 180) * scale) + player_x,
          player_y1 = (sin(player_angle * M_PI / 180) * scale) + player_y,
@@ -70,14 +64,6 @@ public:
 void MyWin::KeyCB(int key, int scancode, int action, int mods)
 {
    AGLWindow::KeyCB(key, scancode, action, mods); // f-key full screen switch
-   // if ((key == GLFW_KEY_SPACE) && action == GLFW_PRESS)
-   // {
-   //    ; // do something
-   // }
-   // if (key == GLFW_KEY_H && (action == GLFW_PRESS))
-   // {
-   //    ; // do something
-   // }
 }
 
 // ==========================================================================
@@ -91,11 +77,11 @@ void MyWin::MainLoop()
 {
    ViewportOne(0, 0, wd, ht);
 
-   GLFWwindow *window;
+   // GLFWwindow *window;
    // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
    clock_t start;
-   double duration;
+   // double duration;
 
    PlayerLine player;
    EnemyLine enemies[10][10]; // wrogowie na wspolrzednych 0,0 i 9,9 nie sa rysowani jak cos
@@ -104,13 +90,12 @@ void MyWin::MainLoop()
 
    float player_position_x = -0.9f, player_position_y = -0.9f, player_rotation_angle = 45.0;
    float finish_position_x = 0.9f, finish_position_y = 0.9f, finish_rotation_angle = 45.0;
-   float screen_space = 1.8f;
    int amount_of_columns = 10, amount_of_rows = 10;
-   GLfloat enemy_position_X, enemy_position_Y;
+   // GLfloat enemy_position_X, enemy_position_Y;
 
    float player_movement = 0.005;
 
-   float enemy_rotations[amount_of_columns][amount_of_rows];
+   // float enemy_rotations[amount_of_columns][amount_of_rows];
 
    for (int i = 0; i < amount_of_columns; i++)
    {
@@ -235,7 +220,7 @@ int main(int argc, char *argv[])
 
    srand(seed);
    MyWin win;
-   win.Init(800, 800, "labyrinth", 0, 33);
+   win.Init(1200, 1200, "labyrinth", 0, 33);
    win.MainLoop();
    return 0;
 }

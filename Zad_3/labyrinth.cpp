@@ -159,13 +159,16 @@ void MyWin::MainLoop()
    float screen_space = 1.8f;
    int amount_of_columns = 10, amount_of_rows = 10;
    GLfloat enemy_position_X, enemy_position_Y;
-   float enemy_rotation = rand() % 180 + 1;
+   // float enemy_rotation = rand() % 180 + 1;
    float player_movement = 0.005;
+
+   float enemy_rotations[amount_of_columns][amount_of_rows];
 
    for (int i = 0; i < amount_of_columns; i++)
    {
       for (int j = 0; j < amount_of_rows; j++)
       {
+         enemy_rotations[i][j] = rand() % 180 + 1;
       }
    }
    do
@@ -186,7 +189,7 @@ void MyWin::MainLoop()
          enemy_position_X = -0.9f + (0.2) * column;
          enemy_position_Y = -0.9f;
 
-         enemies[0][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
+         enemies[0][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[0][column]);
       }
 
       //drawing everything in the middle
@@ -197,7 +200,7 @@ void MyWin::MainLoop()
             enemy_position_X = -0.9f + 0.2 * column;
             enemy_position_Y = -0.9f + 0.2 * row;
 
-            enemies[row][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
+            enemies[row][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[row][column]);
          }
       }
       //drawing last row
@@ -206,7 +209,7 @@ void MyWin::MainLoop()
          enemy_position_X = -0.9 + 0.2 * column;
          enemy_position_Y = 0.9f;
 
-         enemies[amount_of_rows - 1][column].draw(enemy_position_X, enemy_position_Y, enemy_rotation);
+         enemies[amount_of_rows - 1][column].draw(enemy_position_X, enemy_position_Y, enemy_rotations[amount_of_rows - 1][column]);
       }
 
       AGLErrors("main-afterdraw");

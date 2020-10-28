@@ -13,10 +13,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "BackgroundSquare.hpp"
-#include "PlayerLine.hpp"
-#include "EnemyLine.hpp"
-#include "FinishLine.hpp"
+int amount_of_columns = 10;
+int amount_of_rows = amount_of_columns;
+
+#include "objects/Background.hpp"
+#include "objects/PlayerLine.hpp"
+#include "objects/EnemyLine.hpp"
+#include "objects/FinishLine.hpp"
 
 bool lineLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
@@ -27,7 +30,7 @@ bool lineLine(float x1, float y1, float x2, float y2, float x3, float y3, float 
 
 bool collision_check(float player_x, float player_y, float player_angle, float something_x, float something_y, float something_angle)
 {
-   const float scale = 1.0 / 10;
+   const float scale = 1.0 / amount_of_columns;
 
    float player_x1 = (cos(player_angle * M_PI / 180) * scale) + player_x,
          player_y1 = (sin(player_angle * M_PI / 180) * scale) + player_y,
@@ -55,7 +58,6 @@ public:
    // to jest konstruktor z argumentami, dziedziczacy po  AGLWindow
    virtual void KeyCB(int key, int scancode, int action, int mods);
    // to jest deklaracja wirtualnej (nadpisywalnej w dziedziczeniu) funkcji klasy.
-   // void framebuffer_size_callback(GLFWwindow window, int width, int height);
    void MainLoop(); // deklaracja funkcji, ktora pozniej zostanie uzupelniona
 };
 
@@ -68,34 +70,22 @@ void MyWin::KeyCB(int key, int scancode, int action, int mods)
 
 // ==========================================================================
 
-// void MyWin::framebuffer_size_callback(GLFWwindow window, int width, int height)
-// {
-//    glViewport(0, 0, width, height);
-// }
-
 void MyWin::MainLoop()
 {
    ViewportOne(0, 0, wd, ht);
 
-   // GLFWwindow *window;
-   // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
    clock_t start;
-   // double duration;
 
    PlayerLine player;
-   EnemyLine enemies[10][10]; // wrogowie na wspolrzednych 0,0 i 9,9 nie sa rysowani jak cos
+   EnemyLine enemies[amount_of_columns][amount_of_rows]; // wrogowie na wspolrzednych 0,0 i 9,9 nie sa rysowani jak cos
    FinishLine finish;
-   BackgroundSqare background;
+   Background background;
 
-   float player_position_x = -0.9f, player_position_y = -0.9f, player_rotation_angle = 45.0;
-   float finish_position_x = 0.9f, finish_position_y = 0.9f, finish_rotation_angle = 45.0;
-   int amount_of_columns = 10, amount_of_rows = 10;
-   // GLfloat enemy_position_X, enemy_position_Y;
+   float board_pixel = 2.0 / amount_of_columns;
+   float player_position_x = (-1.0 + board_pixel / 2), player_position_y = (-1.0 + board_pixel / 2), player_rotation_angle = 45.0;
+   float finish_position_x = (1.0 - board_pixel / 2), finish_position_y = (1.0 - board_pixel / 2), finish_rotation_angle = 45.0;
 
    float player_movement = 0.005;
-
-   // float enemy_rotations[amount_of_columns][amount_of_rows];
 
    for (int i = 0; i < amount_of_columns; i++)
    {
@@ -112,14 +102,26 @@ void MyWin::MainLoop()
 
       AGLErrors("main-loopbegin");
       // =====================================================        Drawing
-      background.draw();
+      bool is_black = true;
+      for (int i = 0; i < amount_of_rows; i++)
+      {
+         for (int j = 0; j < amount_of_columns; j++)
+         {
+            background.draw(-0.9 + j * board_pixel, -0.9 + i * board_pixel, is_black);
+            is_black = not is_black;
+         }
+         if (amount_of_columns % 2 == 0)
+         {
+            is_black = not is_black;
+         }
+      }
       //drawing lowest row
       player.draw(player_position_x, player_position_y, player_rotation_angle);
 
       for (int column = 1; column < amount_of_columns; column++)
       {
-         enemies[0][column].x = -0.9f + (0.2) * column;
-         enemies[0][column].y = -0.9f;
+         enemies[0][column].x = (-1.0 + board_pixel / 2) + (board_pixel * column);
+         enemies[0][column].y = (-1.0 + board_pixel / 2);
          enemies[0][column].draw();
       }
 
@@ -128,16 +130,16 @@ void MyWin::MainLoop()
       {
          for (int column = 0; column < amount_of_columns; column++)
          {
-            enemies[row][column].x = -0.9f + 0.2 * column;
-            enemies[row][column].y = -0.9f + 0.2 * row;
+            enemies[row][column].x = (-1.0 + board_pixel / 2) + board_pixel * column;
+            enemies[row][column].y = (-1.0 + board_pixel / 2) + board_pixel * row;
             enemies[row][column].draw();
          }
       }
       //drawing last row
       for (int column = 0; column < amount_of_columns - 1; column++)
       {
-         enemies[amount_of_rows - 1][column].x = -0.9 + 0.2 * column;
-         enemies[amount_of_rows - 1][column].y = 0.9f;
+         enemies[amount_of_rows - 1][column].x = (-1.0 + board_pixel / 2) + board_pixel * column;
+         enemies[amount_of_rows - 1][column].y = (1.0 - board_pixel / 2);
          enemies[amount_of_rows - 1][column].draw();
       }
       finish.draw(finish_position_x, finish_position_y, finish_rotation_angle);
@@ -197,9 +199,7 @@ void MyWin::MainLoop()
          exit(EXIT_SUCCESS);
       }
 
-      // duration = (clock() - start) / (double)CLOCKS_PER_SEC;
-      // usleep(1000 / 144 - duration);
-      WaitForFixedFPS(1000.0 / 144.0);
+      WaitForFixedFPS(1000.0 / 60.0);
    } while ((glfwGetKey(win(), GLFW_KEY_Q) != GLFW_PRESS &&
              glfwWindowShouldClose(win()) == 0));
 }
@@ -208,13 +208,36 @@ int main(int argc, char *argv[])
 {
    int seed = time(NULL);
 
+   if (argc > 3)
+   {
+      printf("Wrong arguments.");
+      exit(EXIT_FAILURE);
+   }
    if (argc < 2)
+   {
+      printf("Assuming board side length: %d\n", amount_of_columns);
+      amount_of_columns = 10;
+      amount_of_rows = 10;
+   }
+   else
+   {
+      amount_of_columns = atoi(argv[1]);
+      if (amount_of_columns < 10)
+      {
+         printf("Minimum siede length is 10\n");
+         exit(EXIT_FAILURE);
+      }
+      printf("Given side length: %d\n", amount_of_columns);
+      amount_of_rows = amount_of_columns;
+   }
+
+   if (argc < 3)
    {
       printf("Assuming seed: %d\n", seed);
    }
    else
    {
-      seed = atoi(argv[1]);
+      seed = atoi(argv[2]);
       printf("Given seed: %d\n", seed);
    }
 

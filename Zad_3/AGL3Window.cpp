@@ -101,6 +101,11 @@ void AGLWindow::WaitForFixedFPS(float frame_time)
 // Private functions:
 //===========================================================================
 
+void AGLWindow::user_resizes_window(GLFWwindow *window, int width, int height)
+{
+   printf("DUPA");
+}
+
 // Init now not private:
 void AGLWindow::Init(int width, int height, const char *name, int fullscr, int vers)
 {
@@ -162,7 +167,6 @@ void AGLWindow::Init(int width, int height, const char *name, int fullscr, int v
    ht = height;
    aspect = float(wd) / ht;
    // Ensure we can capture the escape key being pressed below
-   // glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
    glfwSwapInterval(1); // 60 fps ?
    glEnable(GL_MULTISAMPLE);
 }
@@ -171,7 +175,10 @@ void AGLWindow::CallbackResize(GLFWwindow *window, int cx, int cy)
 {
    void *ptr = glfwGetWindowUserPointer(window);
    if (AGLWindow *winPtr = static_cast<AGLWindow *>(ptr))
-      winPtr->Resize(cx, cy);
+   {
+      int side = min(cx, cy);
+      winPtr->Resize(side, side);
+   }
 }
 
 void AGLWindow::CallbackKey(GLFWwindow *window, int key, int scancode, int action, int mods)

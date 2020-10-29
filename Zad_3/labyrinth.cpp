@@ -1,4 +1,10 @@
-
+// ==========================================================================
+// Labyrinth game
+//
+// Ver.1  29.I.2020 (c) Maksymilian Czudziak
+// ==========================================================================
+// labyrinth.cpp
+//===========================================================================
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -107,7 +113,7 @@ void MyWin::MainLoop()
       {
          for (int j = 0; j < amount_of_columns; j++)
          {
-            background.draw(-0.9 + j * board_pixel, -0.9 + i * board_pixel, is_black);
+            background.draw(-1.0 + j * board_pixel, -1.0 + i * board_pixel, is_black, board_pixel);
             is_black = not is_black;
          }
          if (amount_of_columns % 2 == 0)
@@ -187,7 +193,6 @@ void MyWin::MainLoop()
             }
          }
       }
-
       if (collision_check(player_position_x,
                           player_position_y,
                           player_rotation_angle,
@@ -213,7 +218,18 @@ int main(int argc, char *argv[])
       printf("Wrong arguments.");
       exit(EXIT_FAILURE);
    }
+
    if (argc < 2)
+   {
+      printf("Assuming seed: %d\n", seed);
+   }
+   else
+   {
+      seed = atoi(argv[1]);
+      printf("Given seed: %d\n", seed);
+   }
+
+   if (argc < 3)
    {
       printf("Assuming board side length: %d\n", amount_of_columns);
       amount_of_columns = 10;
@@ -221,24 +237,9 @@ int main(int argc, char *argv[])
    }
    else
    {
-      amount_of_columns = atoi(argv[1]);
-      if (amount_of_columns < 10)
-      {
-         printf("Minimum siede length is 10\n");
-         exit(EXIT_FAILURE);
-      }
+      amount_of_columns = atoi(argv[2]);
       printf("Given side length: %d\n", amount_of_columns);
       amount_of_rows = amount_of_columns;
-   }
-
-   if (argc < 3)
-   {
-      printf("Assuming seed: %d\n", seed);
-   }
-   else
-   {
-      seed = atoi(argv[2]);
-      printf("Given seed: %d\n", seed);
    }
 
    srand(seed);

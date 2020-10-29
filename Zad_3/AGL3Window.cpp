@@ -1,7 +1,7 @@
 // ==========================================================================
 // AGL3:  GL/GLFW init AGLWindow and AGLDrawable class definitions
 //
-// Ver.3  14.I.2020 (c) A. Łukaszewski
+// Ver.3  14.I.2020 (c) A. Łukaszewski feat. Maksymilian Czudziak
 // ==========================================================================
 // AGLWindow.cpp
 //===========================================================================
@@ -81,9 +81,7 @@ void AGLWindow::MainLoop(void)
    while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
           glfwWindowShouldClose(window) == 0)
    {
-
       // ..... render the scene
-
       glfwSwapBuffers(window);
       glfwPollEvents();
    }
@@ -100,11 +98,6 @@ void AGLWindow::WaitForFixedFPS(float frame_time)
 //===========================================================================
 // Private functions:
 //===========================================================================
-
-void AGLWindow::user_resizes_window(GLFWwindow *window, int width, int height)
-{
-   printf("DUPA");
-}
 
 // Init now not private:
 void AGLWindow::Init(int width, int height, const char *name, int fullscr, int vers)

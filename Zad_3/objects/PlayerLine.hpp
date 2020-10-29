@@ -1,4 +1,3 @@
-
 class PlayerLine : public AGLDrawable
 {
 public:

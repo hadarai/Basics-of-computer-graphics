@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 using namespace std;
 
@@ -56,10 +57,19 @@ void AGLWindow::GetCursorNDC(float *x, float *y)
 
 void AGLWindow::Resize(int _wd, int _ht)
 {
+
    wd = _wd;
    ht = _ht;
+   int side = min(wd, ht);
    aspect = float(ht) / float(wd);
-   ViewportOne(0, 0, (GLsizei)wd, (GLsizei)ht);
+   if (ht > wd)
+   {
+      ViewportOne(0, abs((GLsizei)wd - (GLsizei)ht), side, side);
+   }
+   else
+   {
+      ViewportOne(0, 0, side, side);
+   }
 }
 
 void AGLWindow::KeyCB(int key, int scancode, int action, int mods)
@@ -169,8 +179,10 @@ void AGLWindow::CallbackResize(GLFWwindow *window, int cx, int cy)
    void *ptr = glfwGetWindowUserPointer(window);
    if (AGLWindow *winPtr = static_cast<AGLWindow *>(ptr))
    {
-      int side = min(cx, cy);
-      winPtr->Resize(side, side);
+
+      winPtr->Resize(cx, cy);
+      // int side = min(cx, cy);
+      // winPtr->Resize(side, side);
    }
 }
 

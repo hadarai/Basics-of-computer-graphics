@@ -191,7 +191,9 @@ void Sphere::updateRadius()
 ///////////////////////////////////////////////////////////////////////////////
 void Sphere::clearArrays()
 {
-    std::vector<float>().swap(vertices);
+    std::vector<float>().swap(
+
+    );
     std::vector<float>().swap(normals);
     std::vector<float>().swap(texCoords);
     std::vector<unsigned int>().swap(indices);

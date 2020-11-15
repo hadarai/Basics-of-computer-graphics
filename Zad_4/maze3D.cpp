@@ -24,11 +24,6 @@ int amount_of_layers = amount_of_rows;
 class PlayerCube
 {
 public:
-	// GLuint object_programID;
-	// GLuint MatrixID;
-	GLuint VertexArrayID;
-	GLuint vertexbuffer;
-	GLuint colorbuffer;
 	PlayerCube()
 	{
 		setShaders();
@@ -36,7 +31,8 @@ public:
 	}
 	void setShaders()
 	{
-		// object_programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+		ProgramID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+		MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
 	}
 	void setBuffers()
 	{
@@ -130,10 +126,10 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 	}
-	// void draw(glm::mat4 MVP)
-	void draw()
+	void draw(glm::mat4 MVP)
 	{
-		// glUseProgram
+		glUseProgram(ProgramID);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
 
 		// glUniform1f(0, 1.0 / amount_of_columns); // scale  in vertex shader - tu można coś zmienić by były większe
 		// glUniform2f(1, x, y);					 // line_center in vertex shader - a tu nwm co
@@ -172,6 +168,11 @@ public:
 	}
 
 private:
+	GLuint ProgramID;
+	GLuint MatrixID;
+	GLuint VertexArrayID;
+	GLuint vertexbuffer;
+	GLuint colorbuffer;
 	// kind of something
 };
 
@@ -256,10 +257,10 @@ int main(int argc, char *argv[])
 	glDepthFunc(GL_LESS);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+	// GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
 
 	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	// GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	float camera_X = 4;
 	float camera_Y = 3;
@@ -283,13 +284,7 @@ int main(int argc, char *argv[])
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Use our shader
-		glUseProgram(programID);
-
-		// Send our transformation to the currently bound shader,
-		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-		test_cube.draw();
+		test_cube.draw(MVP);
 
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
@@ -350,7 +345,7 @@ int main(int argc, char *argv[])
 	// Cleanup VBO and shader
 	// glDeleteBuffers(1, &vertexbuffer);
 	// glDeleteBuffers(1, &colorbuffer);
-	glDeleteProgram(programID);
+	// glDeleteProgram(programID);
 	// glDeleteVertexArrays(1, &VertexArrayID);
 
 	// Close OpenGL window and terminate GLFW

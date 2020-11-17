@@ -13,11 +13,11 @@ glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
 // position
-glm::vec3 position = glm::vec3(0, 0, 5);
+glm::vec3 position = glm::vec3(-0.9, 0.9, 0.9);
 // horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
 // vertical angle : 0, look at the horizon
-float verticalAngle = 0.0f;
+float verticalAngle = (-3.14 / 4);
 // Initial Field of View
 float initialFoV = 45.0f;
 

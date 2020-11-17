@@ -24,16 +24,7 @@ public:
         static const GLfloat g_vertex_buffer_data[] = {
             -2.0f, 3.0f, -2.0f,
             -1.0f, 2.0f, 0.0f,
-            1.0f, 2.0f, 1.0f,
-            2.0f, 2.0f, 2.0f,
-            2.0f, 3.0f, 2.0f,
-            3.0f, 2.0f, 2.0f};
-
-        // One color for each vertex. They were generated randomly.
-        // static const GLfloat g_color_buffer_data[] = {
-        //     0.583f, 0.771f, 0.014f,
-        //     0.609f, 0.115f, 0.436f,
-        //     0.327f, 0.483f, 0.844f};
+            1.0f, 2.0f, 1.0f};
 
         // GLuint vertexbuffer;
         glGenBuffers(1, &vertexbuffer);
@@ -41,24 +32,16 @@ public:
         glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
         // fill "indices" as needed
-        indices.push_back(0);
-        indices.push_back(1);
-        indices.push_back(2);
-        indices.push_back(3);
-        indices.push_back(4);
-        indices.push_back(5);
+        // indices.push_back(0);
+        // indices.push_back(1);
+        // indices.push_back(2);
         // Generate a buffer for the indices
 
-        glGenBuffers(1, &elementbuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-        // GLuint colorbuffer;
-        // glGenBuffers(1, &colorbuffer);
-        // glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+        // glGenBuffers(1, &elementbuffer);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
     }
-    void draw(glm::mat4 MVP)
+    void draw(glm::mat4 MVP, glm::vec3 point_1, glm::vec3 point_2, glm::vec3 point_3)
     {
 
         glUseProgram(ProgramID);
@@ -69,7 +52,14 @@ public:
 
         // glEnable(GL_CULL_FACE);
         // glFrontFace(GL_CCW);
-        // glCullFace(GL_BACK);
+
+        static const GLfloat g_vertex_buffer_data[] = {
+            point_1[0], point_1[1], point_1[2],
+            point_2[0], point_2[1], point_2[2],
+            point_3[0], point_3[1], point_3[2]}; // glCullFace(GL_BACK);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -95,17 +85,17 @@ public:
         // );
 
         // Draw the triangle !
-        // glDrawArrays(GL_TRIANGLES, 0, 3); // 12*3 indices starting at 0 -> 12 triangles
+        glDrawArrays(GL_TRIANGLES, 0, 3); // 12*3 indices starting at 0 -> 12 triangles
         // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 
-        // Draw the triangles !
-        glDrawElements(
-            GL_TRIANGLES,    // mode
-            indices.size(),  // count
-            GL_UNSIGNED_INT, // type
-            (void *)0        // element array buffer offset
-        );
+        // // Draw the triangles !
+        // glDrawElements(
+        //     GL_TRIANGLES,    // mode
+        //     indices.size(),  // count
+        //     GL_UNSIGNED_INT, // type
+        //     (void *)0        // element array buffer offset
+        // );
 
         glDisableVertexAttribArray(0);
         // glDisableVertexAttribArray(1);

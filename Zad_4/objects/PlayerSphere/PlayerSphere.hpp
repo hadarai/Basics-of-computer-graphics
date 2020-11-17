@@ -1,7 +1,7 @@
 class PlayerSphere
 {
 public:
-    PlayerSphere(GLfloat x0, GLfloat y0, GLfloat z0, GLfloat r)
+    PlayerSphere()
     {
         // printf("x0=%f, y0=%f, z0=%f, r=%f\n", x0, y0, z0, r);
         // x0 = x0;
@@ -9,7 +9,7 @@ public:
         // z0 = z0;
         // r = r;
         setShaders();
-        setBuffers(x0, y0, z0, r);
+        setBuffers();
     }
     void setShaders()
     {
@@ -17,46 +17,37 @@ public:
         ProgramID = LoadShaders("objects/PlayerSphere/PlayerSphereVertexShader.vertexshader", "objects/PlayerSphere/PlayerSphereFragmentShader.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
-    void setBuffers(GLfloat x0, GLfloat y0, GLfloat z0, GLfloat r)
+    void setBuffers()
     {
         // printf("DUPA1\n");
         glGenVertexArrays(1, &VertexArrayID);
         glBindVertexArray(VertexArrayID);
 
         GLfloat g_vertex_buffer_data[660];
-        int index = 0;
-        printf("x0=%f, y0=%f, z0=%f, r=%f", x0, y0, z0, r);
-        for (float theta = 0; theta < M_PI; theta += (M_PI / 10))
-        {
-            for (float phi = 0; phi < (2 * M_PI); phi += (M_PI / 10))
-            {
-                printf("Teraz jestem na: %d\n", index);
-                g_vertex_buffer_data[index + 0] = x0 + r * sin(theta) * cos(phi);
-                g_vertex_buffer_data[index + 1] = y0 + r * sin(theta) * sin(phi);
-                g_vertex_buffer_data[index + 2] = z0 + r * cos(theta);
-                printf("wygenerowalem: (%f, %f, %f)\n", x0 + r * sin(theta) * cos(phi), g_vertex_buffer_data[index + 1], g_vertex_buffer_data[index + 2]);
-                index += 3;
-            }
-        }
+        // int index = 0;
+        // printf("x0=%f, y0=%f, z0=%f, r=%f", x0, y0, z0, r);
+        // for (float theta = 0; theta < M_PI; theta += (M_PI / 10))
+        // {
+        //     for (float phi = 0; phi < (2 * M_PI); phi += (M_PI / 10))
+        //     {
+        //         printf("Teraz jestem na: %d\n", index);
+        //         g_vertex_buffer_data[index + 0] = x0 + r * sin(theta) * cos(phi);
+        //         g_vertex_buffer_data[index + 1] = y0 + r * sin(theta) * sin(phi);
+        //         g_vertex_buffer_data[index + 2] = z0 + r * cos(theta);
+        //         printf("wygenerowalem: (%f, %f, %f)\n", x0 + r * sin(theta) * cos(phi), g_vertex_buffer_data[index + 1], g_vertex_buffer_data[index + 2]);
+        //         index += 3;
+        //     }
+        // }
 
-        // for (int i = 0; i < 120; i++) //; i += 2)
+        // for (int i = 0; i < 220; i++) //; i += 2)
         // {
         //     indices.push_back(i);
         //     indices.push_back(i + 1);
-        //     indices.push_back(i + 11);
+        //     indices.push_back(i + 20);
         //     indices.push_back(i + 1);
-        //     indices.push_back(i + 11);
-        //     indices.push_back(i + 12);
+        //     indices.push_back(i + 20);
+        //     indices.push_back(i + 21);
         // }
-        for (int i = 0; i < 220; i++) //; i += 2)
-        {
-            indices.push_back(i);
-            indices.push_back(i + 1);
-            indices.push_back(i + 20);
-            indices.push_back(i + 1);
-            indices.push_back(i + 20);
-            indices.push_back(i + 21);
-        }
 
         // printf("DUPA2\n");
         glGenBuffers(1, &vertexbuffer);
@@ -69,7 +60,7 @@ public:
 
         // printf("DUPA3\n");
     }
-    void draw(glm::mat4 MVP)
+    void draw(glm::mat4 MVP, glm::vec3 center_position)
     {
         // printf("DUPA6\n");
         glUseProgram(ProgramID);
@@ -79,6 +70,40 @@ public:
         // glFrontFace(GL_CCW);
         // glCullFace(GL_BACK);
         // printf("DUPA5\n");
+        GLfloat x0 = center_position[0];
+        GLfloat y0 = center_position[1];
+        GLfloat z0 = center_position[2];
+        GLfloat g_vertex_buffer_data[660];
+        int index = 0;
+        // GLfloat x0 = 0.0, y0 = 0.0, z0 = 0.0, r = 1.0;
+        // setBuffers(xa, ya, za, ra);
+        for (float theta = 0; theta < M_PI; theta += (M_PI / 10))
+        {
+            for (float phi = 0; phi < (2 * M_PI); phi += (M_PI / 10))
+            {
+                // printf("Teraz jestem na: %d\n", index);
+                g_vertex_buffer_data[index + 0] = x0 + r * sin(theta) * cos(phi);
+                g_vertex_buffer_data[index + 1] = y0 + r * sin(theta) * sin(phi);
+                g_vertex_buffer_data[index + 2] = z0 + r * cos(theta);
+                // printf("wygenerowalem: (%f, %f, %f)\n", x0 + r * sin(theta) * cos(phi), g_vertex_buffer_data[index + 1], g_vertex_buffer_data[index + 2]);
+                index += 3;
+            }
+        }
+        for (int i = 0; i < 220; i++) //; i += 2)
+        {
+            indices.push_back(i);
+            indices.push_back(i + 1);
+            indices.push_back(i + 20);
+            indices.push_back(i + 1);
+            indices.push_back(i + 20);
+            indices.push_back(i + 21);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
@@ -119,6 +144,6 @@ private:
     // GLfloat x0;
     // GLfloat y0;
     // GLfloat z0;
-    // GLfloat r;
+    GLfloat r = 0.1;
     // kind of something
 };

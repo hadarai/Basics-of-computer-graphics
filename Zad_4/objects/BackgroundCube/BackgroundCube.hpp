@@ -30,30 +30,21 @@ public:
         indices = {
             0, 1, 2,
             1, 2, 3,
+
             4, 6, 5,
             6, 5, 7,
+
             0, 1, 4,
             1, 4, 5,
+
             2, 3, 6,
             3, 6, 7,
+
             0, 2, 4,
             2, 4, 6,
+
             1, 3, 5,
             3, 5, 7};
-        for (int i = 0; i < 4; i++)
-        {
-            indices.push_back(i);
-            indices.push_back(i + 1);
-            indices.push_back(i + 2);
-        }
-        // One color for each vertex. They were generated randomly.
-        // static GLfloat g_color_buffer_data[12 * 3 * 3];
-        // for (int v = 0; v < 12 * 3; v++)
-        // {
-        //     g_color_buffer_data[3 * v + 0] = 0.980f;
-        //     g_color_buffer_data[3 * v + 1] = 0.8f;
-        //     g_color_buffer_data[3 * v + 2] = 0.1f;
-        // }
 
         static const GLfloat g_color_buffer_data[] = {
             0.583f, 0.771f, 0.014f,

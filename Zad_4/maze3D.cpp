@@ -129,33 +129,13 @@ int main(int argc, char *argv[])
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	// float camera_X = 4;
-	// float camera_Y = 3;
-	// float FoV = 45.0f;
-
-	// // Model matrix : an identity matrix (model will be at the origin)
-	// glm::mat4 Model = glm::mat4(1.0f);
-	// // Camera matrix
-	// glm::mat4 View = glm::lookAt(
-	// 	glm::vec3(camera_X, camera_Y, -3), // Camera is at (4,3,-3), in World Space
-	// 	glm::vec3(0, 0, 0),				   // and looks at the origin
-	// 	glm::vec3(0, 1, 0)				   // Head is up (set to 0,-1,0 to look upside-down)
-	// );
-	// // Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
-	// glm::mat4 Projection = glm::perspective(
-	// 	glm::radians(FoV), // The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
-	// 	4.0f / 3.0f,	   // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
-	// 	0.1f,			   // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-	// 	100.0f			   // Far clipping plane. Keep as little as possible.
-	// );
-
-	// // Our ModelViewProjection : multiplication of our 3 matrices
-	// glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
-
 	BackgroundCube test_cube;
 	ObstacleTriangle test_triangle;
-	PlayerSphere test_sphere(2.0f, 2.0f, 2.0f, 1.0f);
+	PlayerSphere test_sphere;
 
+	glm::vec3 pos1_tri = glm::vec3(-0.7, -1.0, -1.0);
+	glm::vec3 pos2_tri = glm::vec3(-0.7, -1.0, -0.8);
+	glm::vec3 pos3_tri = glm::vec3(-0.7, -0.9, -0.7);
 	do
 	{
 		// Clear the screen
@@ -169,8 +149,8 @@ int main(int argc, char *argv[])
 		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		test_cube.draw(MVP);
-		test_triangle.draw(MVP);
-		test_sphere.draw(MVP);
+		test_triangle.draw(MVP, pos1_tri, pos2_tri, pos3_tri);
+		test_sphere.draw(MVP, glm::vec3(-0.9f, -0.9f, -0.9f));
 
 		// ==========================================================
 

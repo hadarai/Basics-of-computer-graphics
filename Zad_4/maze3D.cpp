@@ -20,9 +20,9 @@ using namespace glm;
 #include <common/shader.hpp>
 #include <common/controls.hpp>
 
-#include "objects/BackgroundCube/BackgroundCube.hpp"
+#include "objects/Cube/Cube.hpp"
 #include "objects/PlayerSphere/PlayerSphere.hpp"
-#include "ObstacleTriangle.hpp"
+#include "objects/Triangle/Triangle.hpp"
 
 int amount_of_columns = 10;
 int amount_of_rows = amount_of_columns;
@@ -40,6 +40,12 @@ MessageCallback(GLenum source,
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
 			type, severity, message);
+	if (type == GL_DEBUG_TYPE_ERROR)
+	{
+		int *a = NULL; // halt gdb. or entire system if kernel is not fast enough;
+		int payload = 2137;
+		*a = payload;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -129,35 +135,108 @@ int main(int argc, char *argv[])
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	BackgroundCube test_cube;
-	ObstacleTriangle test_triangle;
-	PlayerSphere test_sphere;
+	// glm::vec3 pos1_tri = glm::vec3(0.707899, 0.716031, 0.093660);
+	glm::vec3 pos1_tri = glm::vec3(1.0, 1.0, 1.0);
+	glm::vec3 pos2_tri = glm::vec3(0.786788, 0.808426, 0.033422);
+	glm::vec3 pos3_tri = glm::vec3(0.869499, 0.719856, 0.096147);
 
-	glm::vec3 pos1_tri = glm::vec3(-0.7, -1.0, -1.0);
-	glm::vec3 pos2_tri = glm::vec3(-0.7, -1.0, -0.8);
-	glm::vec3 pos3_tri = glm::vec3(-0.7, -0.9, -0.7);
+	glm::vec3 pos4_tri = glm::vec3(0.707899, 0.716031, 1.093660);
+	glm::vec3 pos5_tri = glm::vec3(0.786788, 1.808426, 0.033422);
+	glm::vec3 pos6_tri = glm::vec3(0.869499, 0.719856, 1.096147);
+
+	// Cube test_cube;
+	// Triangle test_triangle(pos4_tri, pos2_tri, pos3_tri);
+	// Triangle test_triangle2(pos4_tri, pos5_tri, pos6_tri);
+	// Triangle test_triangle;
+	// Triangle test_triangle2;
+
+	// test_triangle.setBuffers(pos4_tri, pos2_tri, pos3_tri);
+	// test_triangle2.setBuffers(pos4_tri, pos5_tri, pos6_tri);
+
+	Triangle triangles[amount_of_columns][amount_of_rows][amount_of_layers];
+	// PlayerSphere test_sphere;
+	float x_move, y_move, z_move;
+	glm::vec3 first_triangle_vertex[amount_of_rows][amount_of_columns][amount_of_layers];
+	glm::vec3 second_triangle_vertex[amount_of_rows][amount_of_columns][amount_of_layers];
+	glm::vec3 third_triangle_vertex[amount_of_rows][amount_of_columns][amount_of_layers];
+	for (int i = 0; i < amount_of_columns; i++) // X
+	{
+		// int j = 0;
+		for (int j = 0; j < amount_of_rows; j++) // Y
+		{
+			// int i = 0, j = 0;
+			for (int k = 0; k < amount_of_layers; k++) // Z
+			{
+				glm::vec3 crate_center =
+					glm::vec3(-1.0 + i * (2.0 / amount_of_columns),
+							  -1.0 + j * (2.0 / amount_of_rows),
+							  -1.0 + k * (2.0 / amount_of_layers));
+				// printf("Mamy trojkat o srodku:(%f, %f, %f)\n", crate_center.x, crate_center.y, crate_center.z);
+				x_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				y_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				z_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				// printf("Mamy trojkat przesuniety o (%f, %f, %f)\n", x_move, y_move, z_move);
+				first_triangle_vertex[i][j][k] = crate_center + glm::vec3(x_move, y_move, z_move);
+				// printf("Mamy wierzcholek trojkata na pozycji (%f, %f, %f)\n", first_triangle_vertex[i][j][k].x, first_triangle_vertex[i][j][k].y, first_triangle_vertex[i][j][k].z);
+				x_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				y_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				z_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				second_triangle_vertex[i][j][k] = crate_center + glm::vec3(x_move, y_move, z_move);
+				x_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				y_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				z_move = (((float)rand() / (float)(RAND_MAX)) / 10 * 2) - 0.1;
+				third_triangle_vertex[i][j][k] = crate_center + glm::vec3(x_move, y_move, z_move);
+				// printf("Mamy przykladowy trojkat o wierzcholkach: (%f, %f, %f), (%f, %f, %f), (%f, %f, %f)\n",
+				// 	   first_triangle_vertex[i][j][k].x,
+				// 	   first_triangle_vertex[i][j][k].y,
+				// 	   first_triangle_vertex[i][j][k].z,
+				// 	   second_triangle_vertex[i][j][k].x,
+				// 	   second_triangle_vertex[i][j][k].y,
+				// 	   second_triangle_vertex[i][j][k].z,
+				// 	   third_triangle_vertex[i][j][k].x,
+				// 	   third_triangle_vertex[i][j][k].y,
+				// 	   third_triangle_vertex[i][j][k].z);
+
+				triangles[i][j][k].setBuffers(first_triangle_vertex[i][j][k], second_triangle_vertex[i][j][k], third_triangle_vertex[i][j][k]);
+			}
+		}
+	}
+	// test_triangle2.setBuffers(pos4_tri, pos5_tri, pos6_tri);
+	// int i = 1, j = 1, k = 1;
+	// test_triangle2.set_vertexes(pos4_tri, pos5_tri, pos6_tri);
+	glm::vec3 player_position = glm::vec3(-1.0, -1.0, -1.0);
+
 	do
 	{
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// ========================================================
-		computeMatricesFromInputs();
+		computeMatricesFromInputs(player_position);
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
 		glm::mat4 ModelMatrix = glm::mat4(1.0);
 		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-		test_cube.draw(MVP);
-		test_triangle.draw(MVP, pos1_tri, pos2_tri, pos3_tri);
-		test_sphere.draw(MVP, glm::vec3(-0.9f, -0.9f, -0.9f));
-
+		// test_cube.draw(MVP);
+		// test_triangle.draw(MVP);
+		// test_triangle2.draw(MVP);
+		// test_sphere.draw(MVP, glm::vec3(-0.9f, -0.9f, -0.9f));
+		for (int i = 0; i < amount_of_columns; i++) // X
+		{
+			// int j = 0;
+			for (int j = 0; j < amount_of_rows; j++) // Y
+			{
+				for (int k = 0; k < amount_of_layers; k++) // Z
+				{
+					triangles[i][j][k].draw(MVP);
+				}
+			}
+		}
 		// ==========================================================
-
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
 	} // Check if the ESC key was pressed or the window was closed
 	while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0);

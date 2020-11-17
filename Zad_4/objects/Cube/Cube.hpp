@@ -1,14 +1,14 @@
-class BackgroundCube
+class Cube
 {
 public:
-    BackgroundCube()
+    Cube()
     {
         setShaders();
         setBuffers();
     }
     void setShaders()
     {
-        ProgramID = LoadShaders("objects/BackgroundCube/BackgroundCubeVertexShader.vertexshader", "objects/BackgroundCube/BackgroundCubeFragmentShader.fragmentshader");
+        ProgramID = LoadShaders("objects/Cube/CubeVertexShader.vertexshader", "objects/Cube/CubeFragmentShader.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
     void setBuffers()
@@ -16,7 +16,7 @@ public:
         glGenVertexArrays(1, &VertexArrayID);
         glBindVertexArray(VertexArrayID);
 
-        static const GLfloat g_vertex_buffer_data[] = {
+        GLfloat g_vertex_buffer_data[] = {
             -1.0f, -1.0f, -1.0f,
             -1.0f, -1.0f, 1.0f,
             1.0f, -1.0f, -1.0f,
@@ -46,7 +46,7 @@ public:
             1, 3, 5,
             3, 5, 7};
 
-        static const GLfloat g_color_buffer_data[] = {
+        GLfloat g_color_buffer_data[] = {
             0.583f, 0.771f, 0.014f,
             0.609f, 0.115f, 0.436f,
             0.327f, 0.483f, 0.844f,
@@ -102,6 +102,8 @@ public:
     {
 
         glUseProgram(ProgramID);
+        // Send our transformation to the currently bound shader,
+        // in the "MVP" uniform:
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
 
         // glEnable(GL_CULL_FACE);

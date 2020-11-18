@@ -1,15 +1,17 @@
-class PlayerSphere
+#include <string.h>
+class Sphere
 {
 public:
-    PlayerSphere()
+    Sphere(const char *fragment_shader_location)
     {
-        setShaders();
+        setShaders(fragment_shader_location);
         setBuffers();
     }
-    void setShaders()
+    void setShaders(const char *fragment_shader_location)
     {
         // printf("ustawianie shaderow\n");
-        ProgramID = LoadShaders("objects/PlayerSphere/PlayerSphereVertexShader.vertexshader", "objects/PlayerSphere/PlayerSphereFragmentShader.fragmentshader");
+        // ProgramID = LoadShaders("objects/PlayerSphere/PlayerSphereVertexShader.vertexshader", "objects/PlayerSphere/PlayerSphereFragmentShader.fragmentshader");
+        ProgramID = LoadShaders("objects/Sphere/SphereVertexShader.vertexshader", fragment_shader_location);
         MatrixID = glGetUniformLocation(ProgramID, "MVP");    //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
         ScaleID = glGetUniformLocation(ProgramID, "scale");   //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
         OffsetID = glGetUniformLocation(ProgramID, "offset"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
@@ -117,6 +119,6 @@ private:
 
     std::vector<unsigned short> indices;
 
-    GLfloat r = 0.1;
+    GLfloat r = 0.05;
     // kind of something
 };

@@ -44,6 +44,7 @@ public:
     // virtual void MousePosCB(double xp, double yp);
 
     void MainLoop(void);
+    void secondViewPortSetup(int width, int height);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
                                                        //===========================================================================

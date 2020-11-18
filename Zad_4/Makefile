@@ -6,7 +6,7 @@ libgl_Linux = -lGL
 libgl_Darwin = -framework OpenGL -lglfw
 
 %: %.cpp
-	g++ -I. -g $< -o $@ common/shader.cpp common/controls.cpp $(LDFLAGS)
+	g++ -I. -g $< -o $@ common/shader.cpp common/controls.cpp Window.cpp $(LDFLAGS)
 	
 clean:
 	rm *.out *.o *~ maze3D

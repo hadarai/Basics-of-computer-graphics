@@ -17,15 +17,15 @@ public:
         glBindVertexArray(VertexArrayID);
 
         GLfloat g_vertex_buffer_data[] = {
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, 1.0f,
+            -2.5f, -2.5f, -2.5f,
+            -2.5f, -2.5f, 2.5f,
+            2.5f, -2.5f, -2.5f,
+            2.5f, -2.5f, 2.5f,
 
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f};
+            -2.5f, 2.5f, -2.5f,
+            -2.5f, 2.5f, 2.5f,
+            2.5f, 2.5f, -2.5f,
+            2.5f, 2.5f, 2.5f};
 
         indices = {
             0, 1, 2,
@@ -106,10 +106,6 @@ public:
         // in the "MVP" uniform:
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
 
-        // glEnable(GL_CULL_FACE);
-        // glFrontFace(GL_CCW);
-        // glCullFace(GL_FRONT);
-
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
@@ -132,9 +128,6 @@ public:
             0,        // stride
             (void *)0 // array buffer offset
         );
-
-        // Draw the triangle !
-        // glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
 
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);

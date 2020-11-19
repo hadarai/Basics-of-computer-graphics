@@ -1,11 +1,9 @@
 class Triangle
 {
 public:
-    // Triangle(glm::vec3 point_1, glm::vec3 point_2, glm::vec3 point_3)
     Triangle()
     {
         setShaders();
-        // setBuffers(point_1, point_2, point_3);
     }
     void setShaders()
     {
@@ -22,10 +20,6 @@ public:
     {
         glGenVertexArrays(1, &VertexArrayID);
         glBindVertexArray(VertexArrayID);
-        // printf("Zlapalem trojkat o wierzcholkach: (%f, %f, %f), (%f, %f, %f), (%f, %f, %f)\n",
-        //        point_1.x, point_1.y, point_1.z,
-        //        point_2.x, point_2.y, point_2.z,
-        //        point_3.x, point_3.y, point_3.z);
         GLfloat g_vertex_buffer_data[] = {
             point_1.x, point_1.y, point_1.z,
             point_2.x, point_2.y, point_2.z,
@@ -52,13 +46,8 @@ public:
         glUseProgram(ProgramID);
         glBindVertexArray(VertexArrayID);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        // Send our transformation to the currently bound shader, in the "MVP" uniform
-        // This is done in the main loop since each model will have a different MVP matrix (At least for the M part)
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
-
-        // Draw the triangle !
-        // glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glDrawArrays(GL_TRIANGLES, 0, 3); // 12*3 indices starting at 0 -> 12 triangles
+        glDrawArrays(GL_TRIANGLES, 0, 3);                      // 12*3 indices starting at 0 -> 12 triangles
     }
 
 private:

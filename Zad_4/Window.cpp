@@ -14,31 +14,6 @@ void Errors(const char *comment)
     while (er = glGetError())
         fprintf(stderr, "\nOpenGL ERROR: 0x%04x    =============%s===\n", er, comment);
 }
-// void GLAPIENTRY
-// MessageCallback(GLenum source,
-//                 GLenum type,
-//                 GLuint id,
-//                 GLenum severity,
-//                 GLsizei length,
-//                 const GLchar *message,
-//                 const void *userParam)
-// {
-//     fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-//             (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-//             type, severity, message);
-//     if (type == GL_DEBUG_TYPE_ERROR)
-//     {
-//         int *a = NULL; // halt gdb. or entire system if kernel is not fast enough;
-//         int payload = 2137;
-//         *a = payload;
-//     }
-// }
-
-// Window::~Window()
-// {
-//     glfwDestroyWindow(window);
-//     glfwTerminate();
-// }
 
 float Window::Viewport(int _vtx, int _vty, int _vwd, int _vht)
 {
@@ -56,13 +31,6 @@ float Window::ViewportOne(int _vtx, int _vty, int _vwd, int _vht)
     return float(_vwd) / float(_vht);
 }
 
-// void Window::Resize(int _wd, int _ht)
-// {
-//     wd = _wd;
-//     ht = _ht;
-//     aspect = float(ht) / float(wd);
-//     ViewportOne(0, 0, (GLsizei)wd, (GLsizei)ht);
-// }
 void Window::Resize(int _wd, int _ht)
 {
 
@@ -89,9 +57,6 @@ void Window::KeyCB(int key, int scancode, int action, int mods)
 }
 
 // void Window::MouseButtonCB(int button, int action, int mods) {}
-
-// void Window::ScrollCB(double xp, double yp) {}
-
 // void Window::MousePosCB(double xp, double yp) {}
 
 void Window::WaitForFixedFPS(float frame_time)
@@ -171,7 +136,6 @@ void Window::Init(int width, int height, const char *name, int fullscr, int vers
     glfwSetWindowSizeCallback(window, Window::CallbackResize);
     glfwSetKeyCallback(window, Window::CallbackKey);
     // glfwSetMouseButtonCallback(window, Window::CallbackMouseButton);
-    // glfwSetScrollCallback(window, Window::CallbackScroll);
     // glfwSetCursorPosCallback(window, Window::CallbackMousePos);
 
     glfwGetWindowPos(window, &winPos[0], &winPos[1]);
@@ -208,13 +172,6 @@ void Window::CallbackKey(GLFWwindow *window, int key, int scancode, int action, 
 //     void *ptr = glfwGetWindowUserPointer(window);
 //     if (Window *winPtr = static_cast<Window *>(ptr))
 //         winPtr->MouseButtonCB(button, action, mods);
-// }
-
-// void AGLWindow::CallbackScroll(GLFWwindow *window, double xp, double yp)
-// {
-//     void *ptr = glfwGetWindowUserPointer(window);
-//     if (AGLWindow *winPtr = static_cast<AGLWindow *>(ptr))
-//         winPtr->ScrollCB(xp, yp);
 // }
 
 // void Window::CallbackMousePos(GLFWwindow *window, double xp, double yp)

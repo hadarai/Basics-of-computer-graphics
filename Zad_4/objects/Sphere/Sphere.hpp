@@ -9,11 +9,8 @@ public:
     }
     void setShaders(const char *fragment_shader_location)
     {
-        // printf("ustawianie shaderow\n");
-        // ProgramID = LoadShaders("objects/PlayerSphere/PlayerSphereVertexShader.vertexshader", "objects/PlayerSphere/PlayerSphereFragmentShader.fragmentshader");
         ProgramID = LoadShaders("objects/Sphere/SphereVertexShader.vertexshader", fragment_shader_location);
         MatrixID = glGetUniformLocation(ProgramID, "MVP");    //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
-        ScaleID = glGetUniformLocation(ProgramID, "scale");   //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
         OffsetID = glGetUniformLocation(ProgramID, "offset"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
     void setBuffers()
@@ -23,16 +20,13 @@ public:
         GLfloat x0 = 0.0, y0 = 0.0, z0 = 0.0;
         GLfloat g_vertex_buffer_data[660];
         int index = 0;
-        // printf("x0=%f, y0=%f, z0=%f, r=%f", x0, y0, z0, r);
         for (float theta = 0; theta < M_PI; theta += (M_PI / 10))
         {
             for (float phi = 0; phi < (2 * M_PI); phi += (M_PI / 10))
             {
-                // printf("Teraz jestem na: %d\n", index);
                 g_vertex_buffer_data[index + 0] = x0 + r * sin(theta) * cos(phi);
                 g_vertex_buffer_data[index + 1] = y0 + r * sin(theta) * sin(phi);
                 g_vertex_buffer_data[index + 2] = z0 + r * cos(theta);
-                // printf("wygenerowalem: (%f, %f, %f)\n", x0 + r * sin(theta) * cos(phi), g_vertex_buffer_data[index + 1], g_vertex_buffer_data[index + 2]);
                 index += 3;
             }
         }
@@ -47,7 +41,6 @@ public:
             indices.push_back(i + 21);
         }
 
-        // printf("DUPA2\n");
         glGenBuffers(1, &vertexbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
@@ -56,8 +49,6 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
-        // glEnableVertexAttribArray(0);
-        // glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
             0,        // attribute. No particular reason for 0, but must match the layout in the shader.
             3,        // size
@@ -73,12 +64,6 @@ public:
         glUseProgram(ProgramID);
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
 
-        // glEnable(GL_CULL_FACE);
-        // glFrontFace(GL_CCW);
-        // glCullFace(GL_BACK);
-
-        // glDrawArrays(GL_LINES, 0, 120);
-        // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -92,7 +77,7 @@ public:
         );
 
         GLfloat scale = 0.5;
-        glUniform1f(ScaleID, scale);
+        // glUniform1f(ScaleID, scale);
         glUniform3f(OffsetID, position.x, position.y, position.z);
 
         // Draw the triangles !
@@ -104,13 +89,11 @@ public:
         );
 
         glDisableVertexAttribArray(0);
-        // glDisableVertexAttribArray(1);
     }
 
 private:
     GLuint ProgramID;
     GLuint MatrixID;
-    GLuint ScaleID;
     GLuint OffsetID;
     GLuint VertexArrayID;
     GLuint vertexbuffer;

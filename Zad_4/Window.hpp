@@ -1,20 +1,8 @@
-
-// Include GLEW
 #include <GL/glew.h>
-
 #include <GLFW/glfw3.h>
-
 #include <array>
 
 void Errors(const char *comment); // Prints  Comment and error
-// void GLAPIENTRY
-// MessageCallback(GLenum source,
-//                 GLenum type,
-//                 GLuint id,
-//                 GLenum severity,
-//                 GLsizei length,
-//                 const GLchar *message,
-//                 const void *userParam);
 class Window
 {
 public:
@@ -40,7 +28,6 @@ public:
     virtual void KeyCB(int key, int scancode, int action, int mods);
 
     // virtual void MouseButtonCB(int button, int action, int mods);
-    // virtual void ScrollCB(double xp, double yp);
     // virtual void MousePosCB(double xp, double yp);
 
     void MainLoop(void);
@@ -54,9 +41,6 @@ private:
     void SetFullScreen(bool fullscreen);
 
     int vtx, vty, vwd, vht; // GtCursorNDC() and ViewportOne()
-
-    // vers=33 for GLSL 3.3, fullscr=0 for window or 1/2 for FullScr 1/2 monitor
-
     GLFWmonitor *monitor = nullptr;
     std::array<int, 2> winPos = {0, 0};
     std::array<int, 2> winSize = {0, 0};
@@ -70,6 +54,5 @@ private:
     static void CallbackResize(GLFWwindow *window, int cx, int cy);
     static void CallbackKey(GLFWwindow *window, int key, int scancode, int action, int mods);
     // static void CallbackMouseButton(GLFWwindow *window, int button, int action, int mods);
-    // static void CallbackScroll(GLFWwindow *window, double xp, double yp);
     // static void CallbackMousePos(GLFWwindow *window, double xp, double yp);
 };

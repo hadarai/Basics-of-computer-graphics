@@ -12,5 +12,4 @@ void main(){
 	// interpolated between all 3 surrounding vertices
 	color = fragmentColor;
 	// color = vec3(1.0, 0.0, 0.0);
-
 }

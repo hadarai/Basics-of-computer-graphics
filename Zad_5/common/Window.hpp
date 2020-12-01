@@ -34,7 +34,6 @@ public:
     void secondViewPortSetup(int width, int height);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
-                                                       //===========================================================================
 
 private:
     bool IsFullScreen(void);

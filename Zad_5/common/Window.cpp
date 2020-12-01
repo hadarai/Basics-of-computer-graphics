@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-#include <Window.hpp>
+#include <common/Window.hpp>
 
 using namespace std;
 

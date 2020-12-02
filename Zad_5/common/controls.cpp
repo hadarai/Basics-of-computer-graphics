@@ -24,7 +24,7 @@ float verticalAngle = 3.14f / 4;
 // Initial Field of View
 float initialFoV = 45.0f;
 
-float speed = 1.0f; // 3 units / second
+float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.0005f;
 
 glm::mat4 getViewMatrix(void)

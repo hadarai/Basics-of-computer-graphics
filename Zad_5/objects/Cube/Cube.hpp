@@ -152,6 +152,6 @@ private:
     GLuint colorbuffer;
 
     GLuint elementbuffer;
-    std::vector<unsigned int> indices;
+    std::array<unsigned int, 36> indices;
     // kind of something
 };

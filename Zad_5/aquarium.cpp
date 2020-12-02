@@ -25,10 +25,6 @@ using namespace glm;
 #include "objects/Cube/Cube.hpp"
 #include "objects/Sphere/Sphere.hpp"
 
-int amount_of_columns = 10;
-int amount_of_rows = amount_of_columns;
-int amount_of_layers = amount_of_rows;
-
 Window main_window;
 
 bool distance_between_points(vec3 p1, vec3 p2)
@@ -67,16 +63,18 @@ void Window::MainLoop()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		// new_player_position = first_person_view ? computeMatricesFromInputs(player_position, win()) : computeViewMatrices(win());
 		// printf("%d\n", first_person_view);
+		// new_player_position = computeMatricesFromInputs(player_position, win());
 		if (first_person_view)
 		{
-			printf("Rysuje pierwszoosobowy\n");
+			// printf("Rysuje pierwszoosobowy\n");
 			new_player_position = computeMatricesFromInputs(player_position, win());
 		}
 		else
 		{
-			printf("Rysuje panoramiczny\n");
+			// printf("Rysuje panoramiczny\n");
 			computeViewMatrices(win());
 		}
+		// printf("gracz jest: (%f, %f, %f). Gracz bedzie: (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z, new_player_position.x, new_player_position.y, new_player_position.z);
 		// player_position = computeMatricesFromInputs(player_position, win());
 		ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
@@ -87,10 +85,10 @@ void Window::MainLoop()
 		win_sphere.draw(MVP_first_view, win_position);
 		test_cube.draw(MVP_first_view);
 
-		// bool we_have_collision = false;
-		// we_have_collision = is_point_still_in_aquarium(player_position);
-		// if (!we_have_collision)
-		// 	player_position = new_player_position;
+		bool we_have_collision = false;
+		// we_have_collision = !is_point_still_in_aquarium(player_position);
+		if (!we_have_collision)
+			player_position = new_player_position;
 
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		{
@@ -112,7 +110,7 @@ int main(int argc, char *argv[])
 {
 	int seed = time(NULL);
 
-	if (argc > 3)
+	if (argc > 2)
 	{
 		printf("Wrong arguments.");
 		exit(EXIT_FAILURE);
@@ -126,21 +124,6 @@ int main(int argc, char *argv[])
 	{
 		seed = atoi(argv[1]);
 		printf("Given seed: %d\n", seed);
-	}
-
-	if (argc < 3)
-	{
-		printf("Assuming board side length: %d\n", amount_of_columns);
-		amount_of_columns = 10;
-		amount_of_rows = 10;
-		amount_of_layers = 10;
-	}
-	else
-	{
-		amount_of_columns = atoi(argv[2]);
-		printf("Given side length: %d\n", amount_of_columns);
-		amount_of_rows = amount_of_columns;
-		amount_of_layers = amount_of_rows;
 	}
 
 	srand(seed);

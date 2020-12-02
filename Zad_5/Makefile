@@ -1,4 +1,4 @@
-default: maze3D
+default: aquarium
 
 LDFLAGS = -lGLEW $(libgl_$(shell uname -s)) -lglfw
 
@@ -9,4 +9,4 @@ libgl_Darwin = -framework OpenGL -lglfw
 	g++ -I. -g $< -o $@ common/shader.cpp common/controls.cpp common/Window.cpp $(LDFLAGS)
 	
 clean:
-	rm *.out *.o *~ maze3D
+	rm *.out *.o *~ aquarium

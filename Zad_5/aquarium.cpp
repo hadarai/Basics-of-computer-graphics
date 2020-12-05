@@ -22,10 +22,14 @@ using namespace glm;
 #include <common/controls.hpp>
 #include <common/Window.hpp>
 
-#include "objects/Cube/Cube.hpp"
+#include "objects/Cuboid/Cuboid.hpp"
 #include "objects/Sphere/Sphere.hpp"
+#include "objects/Particle/Particle.hpp"
+#include "objects/Bubbles/Bubbles.hpp"
 
 Window main_window;
+
+int LastUsedParticle = 0;
 
 bool distance_between_points(vec3 p1, vec3 p2)
 {
@@ -40,16 +44,18 @@ bool is_point_still_in_aquarium(vec3 p)
 void Window::MainLoop()
 {
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS); //
 
 	glm::vec3 player_position = glm::vec3(-0.9, -0.9, -0.9);
 	glm::vec3 win_position = glm::vec3(1.05, 1.05, 1.05);
 	glm::vec3 new_player_position;
 
-	Sphere player_position_representation("objects/Sphere/PlayerSphereFragmentShader.fragmentshader");
-	Sphere win_sphere("objects/Sphere/WinSphereFragmentShader.fragmentshader");
-	Cube test_cube;
+	// Sphere player_position_representation("objects/Sphere/PlayerSphereFragmentShader.fragmentshader");
+	// Sphere win_sphere("objects/Sphere/WinSphereFragmentShader.fragmentshader");
+	Cuboid aquarium_cuboid;
 
+	// Particle test_particle;
+	Bubbles test_bubbles;
 	bool first_person_view = true;
 
 	glm::mat4 ProjectionMatrix;
@@ -82,8 +88,12 @@ void Window::MainLoop()
 		MVP_first_view = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		ViewportOne(0, 0, wd, ht);
-		win_sphere.draw(MVP_first_view, win_position);
-		test_cube.draw(MVP_first_view);
+		// win_sphere.draw(MVP_first_view, win_position);
+		aquarium_cuboid.draw(MVP_first_view);
+		Errors("xD1");
+		// test_particle.draw(MVP_first_view);
+		Errors("xD2");
+		test_bubbles.draw(MVP_first_view);
 
 		bool we_have_collision = false;
 		// we_have_collision = !is_point_still_in_aquarium(player_position);

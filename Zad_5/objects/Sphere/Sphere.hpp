@@ -60,7 +60,6 @@ public:
     }
     void draw(glm::mat4 MVP, glm::vec3 position)
     {
-        // printf("DUPA6\n");
         glUseProgram(ProgramID);
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
 
@@ -102,6 +101,6 @@ private:
 
     std::vector<unsigned short> indices;
 
-    GLfloat r = 0.05;
+    GLfloat r = 1.0;
     // kind of something
 };

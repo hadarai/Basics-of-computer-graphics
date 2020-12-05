@@ -50,7 +50,7 @@ void Window::Resize(int _wd, int _ht)
 
 void Window::KeyCB(int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    if (key == GLFW_KEY_L && action == GLFW_PRESS)
     {
         SetFullScreen(!IsFullScreen());
     }

@@ -110,6 +110,15 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     {
         new_player_position -= right * deltaTime * speed;
     }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        new_player_position.y += 0.05;
+    }
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    {
+        new_player_position.y -= 0.05;
+    }
+
     return new_player_position;
 }
 

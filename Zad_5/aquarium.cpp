@@ -44,13 +44,15 @@ bool is_point_still_in_aquarium(vec3 p)
 void Window::MainLoop()
 {
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS); //
+	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glm::vec3 player_position = glm::vec3(-2.0, 1.0, 0.0);
 	glm::vec3 win_position = glm::vec3(1.05, 1.05, 1.05);
 	glm::vec3 new_player_position;
+
+	glm::vec3 upper_light_position = glm::vec3(0.0, 6.0, 0.0);
 
 	Sphere player_position_representation;
 	Cuboid aquarium_cuboid;
@@ -84,12 +86,13 @@ void Window::MainLoop()
 		Errors("xD");
 		std::vector<glm::vec3> bubbles_positions = just_bubbles.move_bubbles_higher();
 
+		printf("Teraz patrze z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
 		aquarium_cuboid.draw(MVP_first_view, viewPosition);
-		just_bubbles.draw(MVP_first_view, viewPosition);
+		just_bubbles.draw(MVP_first_view, viewPosition, player_position, upper_light_position);
 		if (!first_person_view)
 		{
 			player_position_representation.draw(MVP_first_view, player_position, viewPosition);
-			printf("rysuje reprezentacje gracza\n");
+			// printf("rysuje reprezentacje gracza\n");
 		}
 
 		for (auto &bub_pos : bubbles_positions)

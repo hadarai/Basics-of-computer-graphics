@@ -11,7 +11,7 @@ in vec3 fragmentPosition; //fragPos
 
 void main(){
 
-	    vec3 objectColor = vec3(0.804, 0.945, 0.386);
+	vec3 objectColor = vec3(0.804, 0.945, 0.386);
     vec3 lightColor = vec3(1.0, 1.0, 1.0);
     
     float ambientStrength = 0.2;

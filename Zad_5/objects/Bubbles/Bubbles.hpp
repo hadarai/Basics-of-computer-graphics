@@ -20,7 +20,8 @@ public:
     {
         ProgramID = LoadShaders("objects/Bubbles/bubbles.vertexshader", "objects/Bubbles/bubbles.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
-        LightPositionID = glGetUniformLocation(ProgramID, "lightPosition");
+        LightPositionUpperID = glGetUniformLocation(ProgramID, "upperLightPosition");
+        LightPositionPlayerID = glGetUniformLocation(ProgramID, "playerLightPosition");
         ViewPositionID = glGetUniformLocation(ProgramID, "viewPosition");
     }
     void setBuffers()
@@ -144,12 +145,13 @@ public:
         return translations;
     }
 
-    void draw(glm::mat4 MVP, glm::vec3 view_position)
+    void draw(glm::mat4 MVP, glm::vec3 view_position, glm::vec3 player_light_position, glm::vec3 upper_light_position)
     {
         glUseProgram(ProgramID);
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);                          // umieszcza MVP jako uniform z location = MatrixID
-        glUniform3f(LightPositionID, 0.0f, 3.0f, 0.0f);                                 //pozycja swiatla!!!
-        glUniform3f(ViewPositionID, view_position.x, view_position.y, view_position.z); //pozycja swiatla!!!
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);                                                         // umieszcza MVP jako uniform z location = MatrixID
+        glUniform3f(LightPositionPlayerID, player_light_position.x, player_light_position.y, player_light_position.z); //pozycja swiatla!!!
+        glUniform3f(LightPositionUpperID, upper_light_position.x, upper_light_position.y, upper_light_position.z);     //pozycja swiatla!!!
+        glUniform3f(ViewPositionID, view_position.x, view_position.y, view_position.z);
         Errors("step1");
         bindBuffers();
 
@@ -172,7 +174,8 @@ private:
     GLuint ProgramID;
     GLuint MatrixID;
     // GLuint OffsetID;
-    GLuint LightPositionID;
+    GLuint LightPositionUpperID;
+    GLuint LightPositionPlayerID;
     GLuint ViewPositionID;
 
     unsigned int bubbleVAO;

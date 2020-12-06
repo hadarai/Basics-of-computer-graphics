@@ -1,10 +1,10 @@
 #version 330 core
-layout (location = 0) in vec3 vertexPosition ;
+layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 colorData;
 layout (location = 2) in vec3 instanceOffset;
 uniform mat4 MVP;
 // uniform vec3 lightPosition;  
-uniform vec3 viewPos;
+// uniform vec3 viewPos;
 
 // in int gl_InstanceID;
 out vec3 fragmentColor;

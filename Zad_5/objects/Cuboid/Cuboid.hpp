@@ -10,6 +10,8 @@ public:
     {
         ProgramID = LoadShaders("objects/Cuboid/cuboid.vertexshader", "objects/Cuboid/cuboid.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
+        LightPositionID = glGetUniformLocation(ProgramID, "lightPosition");
+        ViewPositionID = glGetUniformLocation(ProgramID, "viewPosition");
     }
     void setBuffers()
     {
@@ -55,14 +57,15 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
     }
-    void draw(glm::mat4 MVP)
+    void draw(glm::mat4 MVP, glm::vec3 view_position)
     {
 
         glUseProgram(ProgramID);
         // Send our transformation to the currently bound shader,
         // in the "MVP" uniform:
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
-
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);                          // umieszcza MVP jako uniform z location = MatrixID
+        glUniform3f(LightPositionID, 0.0f, 3.0f, 0.0f);                                 //pozycja swiatla!!!
+        glUniform3f(ViewPositionID, view_position.x, view_position.y, view_position.z); //pozycja swiatla!!!
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
@@ -93,6 +96,9 @@ private:
     GLuint ProgramID;
     GLuint MatrixID;
     GLuint VertexArrayID;
+    GLuint LightPositionID;
+    GLuint ViewPositionID;
+
     GLuint vertexbuffer;
     // GLuint colorbuffer;
 

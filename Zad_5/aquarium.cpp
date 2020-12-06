@@ -4,14 +4,11 @@
 #include <time.h>
 #include <cmath>
 #include <vector>
-// #include <algorithm>
 
 // Include GLEW
 #include <GL/glew.h>
-
 // Include GLFW
 #include <GLFW/glfw3.h>
-// GLFWwindow *window;
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -48,6 +45,8 @@ void Window::MainLoop()
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS); //
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glm::vec3 player_position = glm::vec3(-2.0, 1.0, 0.0);
 	glm::vec3 win_position = glm::vec3(1.05, 1.05, 1.05);
@@ -55,9 +54,8 @@ void Window::MainLoop()
 
 	Sphere player_position_representation;
 	Cuboid aquarium_cuboid;
+	Bubbles just_bubbles;
 
-	// Particle test_particle;
-	Bubbles test_bubbles;
 	bool first_person_view = true;
 
 	glm::mat4 ProjectionMatrix;
@@ -71,18 +69,6 @@ void Window::MainLoop()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		new_player_position = first_person_view ? computeMatricesFromInputs(player_position, win()) : computeViewMatrices(player_position, win());
-		// printf("%d\n", first_person_view);
-		// new_player_position = computeMatricesFromInputs(player_position, win());
-		// if (first_person_view)
-		// {
-		// 	// printf("Rysuje pierwszoosobowy\n");
-		// 	new_player_position = computeMatricesFromInputs(player_position, win());
-		// }
-		// else
-		// {
-		// 	// printf("Rysuje panoramiczny\n");
-		// 	new_player_position = computeViewMatrices(player_position, win());
-		// }
 		// printf("gracz jest: (%f, %f, %f). Gracz bedzie: (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z, new_player_position.x, new_player_position.y, new_player_position.z);
 		// player_position = computeMatricesFromInputs(player_position, win());
 		ProjectionMatrix = getProjectionMatrix();
@@ -91,12 +77,20 @@ void Window::MainLoop()
 		MVP_first_view = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		ViewportOne(0, 0, wd, ht);
+		glm::vec3 viewPosition = first_person_view ? player_position : glm::vec3(0.0, 6.0, 0.0);
 		// win_sphere.draw(MVP_first_view, win_position);
-		aquarium_cuboid.draw(MVP_first_view);
-		Errors("xD1");
+
 		// test_particle.draw(MVP_first_view);
-		Errors("xD2");
-		std::vector<glm::vec3> bubbles_positions = test_bubbles.move_bubbles_higher();
+		Errors("xD");
+		std::vector<glm::vec3> bubbles_positions = just_bubbles.move_bubbles_higher();
+
+		aquarium_cuboid.draw(MVP_first_view, viewPosition);
+		just_bubbles.draw(MVP_first_view, viewPosition);
+		if (!first_person_view)
+		{
+			player_position_representation.draw(MVP_first_view, player_position, viewPosition);
+			printf("rysuje reprezentacje gracza\n");
+		}
 
 		for (auto &bub_pos : bubbles_positions)
 		{
@@ -107,17 +101,6 @@ void Window::MainLoop()
 				exit(EXIT_SUCCESS);
 			}
 		}
-
-		test_bubbles.draw(MVP_first_view, player_position);
-		if (!first_person_view)
-		{
-			player_position_representation.draw(MVP_first_view, player_position);
-		}
-
-		// bool we_have_collision = false;
-		// we_have_collision = !is_point_still_in_aquarium(new_player_position);
-		// if (!we_have_collision)
-		// 	player_position = new_player_position;
 		if (is_point_still_in_aquarium(new_player_position))
 			player_position = new_player_position;
 

@@ -89,8 +89,8 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        // glEnableVertexAttribArray(0);
+        // glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     }
     void bindBuffers()
     {
@@ -130,6 +130,7 @@ public:
 
         Errors("stepex2");
     }
+
     std::vector<glm::vec3> move_bubbles_higher()
     {
         for (auto &trans : translations)
@@ -137,27 +138,18 @@ public:
             trans.y += 0.0001 + (rand() / (RAND_MAX / (0.015 - 0.001)));
             trans.y = fmod(trans.y, 2.0f);
         }
-        // int trans_index = 0;
-        // for (float z = -1; z < 1 - 0.25; z += 0.25)
-        // {
-        //     for (float x = -2; x < 2 - 0.25; x += 0.25)
-        //     {
-        //         translations[trans_index].y += 0.01; // + offset;
-        //         translations[trans_index].y = fmod(translations[trans_index].y, 2.0f);
-        //         trans_index++;
-        //     }
-        // }
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
         // glBufferData(GL_ARRAY_BUFFER, sizeof(translations), translations, GL_STATIC_DRAW);
         glBufferData(GL_ARRAY_BUFFER, translations.size() * sizeof(glm::vec3), &translations[0], GL_STATIC_DRAW);
         return translations;
     }
-    void draw(glm::mat4 MVP, glm::vec3 player_position)
+
+    void draw(glm::mat4 MVP, glm::vec3 view_position)
     {
         glUseProgram(ProgramID);
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);                                // umieszcza MVP jako uniform z location = MatrixID
-        glUniform3f(LightPositionID, 0.0f, 3.0f, 0.0f);                                       //pozycja swiatla!!!
-        glUniform3f(ViewPositionID, player_position.x, player_position.y, player_position.z); //pozycja swiatla!!!
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);                          // umieszcza MVP jako uniform z location = MatrixID
+        glUniform3f(LightPositionID, 0.0f, 3.0f, 0.0f);                                 //pozycja swiatla!!!
+        glUniform3f(ViewPositionID, view_position.x, view_position.y, view_position.z); //pozycja swiatla!!!
         Errors("step1");
         bindBuffers();
 

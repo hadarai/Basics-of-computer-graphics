@@ -4,13 +4,21 @@
 // in vec3 fragmentColor;
 
 // Ouput data
-out vec3 color;
+out vec4 FragColor;
 
 void main(){
 
 	// Output color = color specified in the vertex shader, 
 	// interpolated between all 3 surrounding vertices
 	// color = fragmentColor;
-	color = vec3(0.2, 0.7, 0.95);
+	
+
+	vec3 objectColor = vec3(0.08, 0.343, 0.46);
+    vec3 lightColor = vec3(1.0, 1.0, 1.0);
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * lightColor;
+
+    vec3 result = ambient * objectColor;
+    FragColor = vec4(result, 1.0);
 
 }

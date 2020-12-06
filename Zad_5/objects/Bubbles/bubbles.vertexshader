@@ -1,16 +1,29 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 2) in vec3 aOffset;
+layout (location = 0) in vec3 vertexPosition ;
+layout (location = 1) in vec3 colorData;
+layout (location = 2) in vec3 instanceOffset;
 uniform mat4 MVP;
+// uniform vec3 lightPosition;  
+uniform vec3 viewPos;
 
 // in int gl_InstanceID;
-out vec3 fColor;
+out vec3 fragmentColor;
+
+out vec3 normalVector;
+out vec3 fragmentPosition;
+// out vec3 lightPos;
 
 void main()
 {
-	float scale = aOffset[0];
-	fColor = vec3(1.0, 0.0,0.0);
-	gl_Position = MVP * vec4(aPos * scale + aOffset, 1.0);
+	normalVector = vertexPosition * 10; // bo kazdy bombelek jest sferą o promieniu 0,1
+	fragmentPosition = vertexPosition + instanceOffset; //tu jest mnozenie razy Model, ale to macierz jednostkowa w moim programie, wiec tego nie robie
+	fragmentColor = colorData;
+	// lightPos = lightPosition;
+
+	// =================================================================
+	// uzaleznie rozmiaru bombelka od jego wysokości. cos trzeba dodac, bo bedzie bardzo szybko roslo, czy cos
+	float scale = 1.0 + instanceOffset[1] / 2.0 / 10.0 * 3.0; // tutaj jest funkcja zmienia ruch wartości między przedziałami [0.0 - 2.0] -> [100 - 130%] (wysokość na rozmiar bombelka)	
+	gl_Position = MVP * vec4(vertexPosition * scale + instanceOffset, 1.0);
 	// gl_Position = MVP * vec4(aPos, 1.0);
 	
 }

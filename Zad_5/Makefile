@@ -6,7 +6,7 @@ libgl_Linux = -lGL
 libgl_Darwin = -framework OpenGL -lglfw
 
 %: %.cpp
-	g++ -I. -g $< -o $@ common/shader.cpp common/controls.cpp common/Window.cpp $(LDFLAGS)
+	g++ -I. -std=gnu++17 -g $< -o $@ common/shader.cpp common/controls.cpp common/Window.cpp $(LDFLAGS)
 	
 clean:
 	rm *.out *.o *~ aquarium

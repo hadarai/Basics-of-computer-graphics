@@ -17,10 +17,10 @@ glm::mat4 ProjectionMatrix;
 // position
 // glm::vec3 position = glm::vec3(-0.9, 0.9, 0.9);
 // horizontal angle : toward -Z
-float horizontalAngle = 3.14f / 4; //
+float horizontalAngle = 3.14f / 2; //
 // vertical angle : 0, look at the horizon
 // float verticalAngle = 13 * 3.14f / 90;
-float verticalAngle = 3.14f / 4;
+float verticalAngle = 0;
 // Initial Field of View
 float initialFoV = 45.0f;
 
@@ -122,15 +122,15 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     return new_player_position;
 }
 
-void computeViewMatrices(GLFWwindow *window)
+glm::vec3 computeViewMatrices(glm::vec3 &position, GLFWwindow *window)
 {
 
-    glm::vec3 camera_position = glm::vec3(2.25, 2.25, 2.25);
+    glm::vec3 camera_position = glm::vec3(0.0, 6.0, 0.0);
     int width, height;
     float specialFoV = 45.0f;
-    float horizontalAngle2 = (-3.14f * 2) - (3.14f / 4 * 3); //-8.6;
+    float horizontalAngle2 = 0;
     // vertical angle : 0, look at the horizon
-    float verticalAngle2 = -3.14f / 4 + (3.14f / 16); //-0.8;
+    float verticalAngle2 = -3.14f / 2;
 
     glfwGetWindowSize(window, &width, &height);
     // printf("Okno jest rozmiaru: %dx%d\n", width, height);
@@ -170,4 +170,37 @@ void computeViewMatrices(GLFWwindow *window)
     // printf("Kamera jest na: (%f, %f, %f)\n", position.x, position.y, position.z);
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
+
+    glm::vec3 new_player_position = position;
+    float lookUpSpeed = 0.01;
+    // Move forward
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        new_player_position.x += lookUpSpeed;
+    }
+    // Move backward
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        new_player_position.x -= lookUpSpeed;
+    }
+    // Strafe right
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        new_player_position.z += lookUpSpeed;
+    }
+    // Strafe left
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        new_player_position.z -= lookUpSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        new_player_position.y += lookUpSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+    {
+        new_player_position.y -= lookUpSpeed;
+    }
+
+    return new_player_position;
 }

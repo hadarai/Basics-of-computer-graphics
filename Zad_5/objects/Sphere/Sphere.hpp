@@ -2,14 +2,14 @@
 class Sphere
 {
 public:
-    Sphere(const char *fragment_shader_location)
+    Sphere()
     {
-        setShaders(fragment_shader_location);
+        setShaders();
         setBuffers();
     }
-    void setShaders(const char *fragment_shader_location)
+    void setShaders()
     {
-        ProgramID = LoadShaders("objects/Sphere/SphereVertexShader.vertexshader", fragment_shader_location);
+        ProgramID = LoadShaders("objects/Sphere/Sphere.vertexshader", "objects/Sphere/Sphere.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP");    //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
         OffsetID = glGetUniformLocation(ProgramID, "offset"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
@@ -101,6 +101,6 @@ private:
 
     std::vector<unsigned short> indices;
 
-    GLfloat r = 1.0;
+    GLfloat r = 0.05;
     // kind of something
 };

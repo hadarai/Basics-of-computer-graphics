@@ -4,7 +4,7 @@
 class Bubbles
 {
 public:
-    Bubbles()
+    Bubbles(float bubble_chance)
     {
         setShaders();
 
@@ -14,7 +14,7 @@ public:
         glGenBuffers(1, &instanceBuffer);
         glGenBuffers(1, &elementBuffer);
 
-        setBuffers();
+        setBuffers(bubble_chance);
     }
     void setShaders()
     {
@@ -24,14 +24,14 @@ public:
         LightPositionPlayerID = glGetUniformLocation(ProgramID, "playerLightPosition");
         ViewPositionID = glGetUniformLocation(ProgramID, "viewPosition");
     }
-    void setBuffers()
+    void setBuffers(float bubble_chance)
     {
         int trans_index = 0;
         for (float z = -1; z < 1 - 0.25; z += 0.25)
         {
             for (float x = -2; x < 2 - 0.25; x += 0.25)
             {
-                if (rand() < 0.5 * RAND_MAX)
+                if (rand() < bubble_chance * RAND_MAX)
                 {
                     glm::vec3 translation;
                     translation.x = (float)x + 0.15; // + offset;
@@ -40,13 +40,11 @@ public:
                     // printf("%d: trans o (%f, %f. %f)\n", trans_index, translation.x, translation.y, translation.z);
                     translations.push_back(translation);
                     trans_index++;
-                    // translations[trans_index++] = translation;
                     colors.push_back(
                         glm::vec3(
                             (float)rand() / RAND_MAX,
                             (float)rand() / RAND_MAX,
                             (float)rand() / RAND_MAX));
-                    // printf("%f ", (float)rand() / RAND_MAX);
                 }
             }
         }
@@ -65,7 +63,7 @@ public:
             }
         }
 
-        for (int i = 0; i < 220; i++) //; i += 2)
+        for (int i = 0; i < 220; i++)
         {
             indices.push_back(i);
             indices.push_back(i + 1);
@@ -84,14 +82,10 @@ public:
         glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(glm::vec3), &colors[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(translations), translations, GL_STATIC_DRAW);
         glBufferData(GL_ARRAY_BUFFER, translations.size() * sizeof(glm::vec3), &translations[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-
-        // glEnableVertexAttribArray(0);
-        // glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     }
     void bindBuffers()
     {
@@ -101,7 +95,7 @@ public:
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
         glVertexAttribPointer(0,
-                              3 /*tu sie mowi, ze sie wklada 3 floaty*/,
+                              3,
                               GL_FLOAT,
                               GL_FALSE,
                               0,
@@ -110,7 +104,7 @@ public:
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
         glVertexAttribPointer(1,
-                              3 /*tu sie mowi, ze sie wklada 3 floaty*/,
+                              3,
                               GL_FLOAT,
                               GL_FALSE,
                               0,
@@ -140,7 +134,6 @@ public:
             trans.y = fmod(trans.y, 2.0f);
         }
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(translations), translations, GL_STATIC_DRAW);
         glBufferData(GL_ARRAY_BUFFER, translations.size() * sizeof(glm::vec3), &translations[0], GL_STATIC_DRAW);
         return translations;
     }
@@ -164,10 +157,6 @@ public:
             translations.size());
 
         Errors("step3");
-
-        // glDisableVertexAttribArray(0);
-        // glDisableVertexAttribArray(1);
-        // glDisableVertexAttribArray(2);
     }
 
 private:
@@ -187,7 +176,6 @@ private:
 
     std::vector<unsigned short> indices;
 
-    // glm::vec3 translations[105];
     std::vector<glm::vec3> translations;
     std::vector<glm::vec3> colors;
 

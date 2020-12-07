@@ -2,6 +2,7 @@
 
 // Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 NormalForTriangle;
 uniform mat4 MVP;
 // uniform vec3 lightPosition;  
 uniform vec3 viewPos;
@@ -18,8 +19,5 @@ void main(){
 	// Output position of the vertex, in clip space : MVP * position
 	gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
 
-	// The color of each vertex will be interpolated
-	// to produce the color of each fragment
-	// fragmentColor = vertexColor;
 }
 

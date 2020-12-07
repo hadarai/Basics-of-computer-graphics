@@ -21,7 +21,6 @@ using namespace glm;
 
 #include "objects/Cuboid/Cuboid.hpp"
 #include "objects/Sphere/Sphere.hpp"
-#include "objects/Particle/Particle.hpp"
 #include "objects/Bubbles/Bubbles.hpp"
 
 Window main_window;
@@ -35,7 +34,6 @@ bool distance_between_points(vec3 p1, vec3 p2)
 
 bool is_point_still_in_aquarium(vec3 p)
 {
-	// p = p + vec3(0.01, 0.01, 0.01);
 	return (-2.0f <= p.x && p.x <= 2.0f &&
 			0.0f <= p.y && p.y <= 2.0f &&
 			-1.0f <= p.z && p.z <= 1.0f);
@@ -53,10 +51,11 @@ void Window::MainLoop()
 	glm::vec3 new_player_position;
 
 	glm::vec3 upper_light_position = glm::vec3(0.0, 6.0, 0.0);
+	float bubblesSpawnRate = 0.4;
 
 	Sphere player_position_representation;
 	Cuboid aquarium_cuboid;
-	Bubbles just_bubbles;
+	Bubbles just_bubbles(bubblesSpawnRate);
 
 	bool first_person_view = true;
 
@@ -66,13 +65,11 @@ void Window::MainLoop()
 	glm::mat4 MVP_first_view;
 	do
 	{
-		// printf("playerpos: (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z);
-		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		new_player_position = first_person_view ? computeMatricesFromInputs(player_position, win()) : computeViewMatrices(player_position, win());
 		// printf("gracz jest: (%f, %f, %f). Gracz bedzie: (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z, new_player_position.x, new_player_position.y, new_player_position.z);
-		// player_position = computeMatricesFromInputs(player_position, win());
+
 		ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
 		ModelMatrix = glm::mat4(1.0);
@@ -80,48 +77,50 @@ void Window::MainLoop()
 
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = first_person_view ? player_position : glm::vec3(0.0, 6.0, 0.0);
-		// win_sphere.draw(MVP_first_view, win_position);
 
-		// test_particle.draw(MVP_first_view);
 		Errors("xD");
 		std::vector<glm::vec3> bubbles_positions = just_bubbles.move_bubbles_higher();
 
-		printf("Teraz patrze z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
-		aquarium_cuboid.draw(MVP_first_view, viewPosition);
+		// printf("Teraz patrze z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
+		aquarium_cuboid.draw(MVP_first_view, viewPosition, player_position, upper_light_position);
 		just_bubbles.draw(MVP_first_view, viewPosition, player_position, upper_light_position);
 		if (!first_person_view)
-		{
 			player_position_representation.draw(MVP_first_view, player_position, viewPosition);
-			// printf("rysuje reprezentacje gracza\n");
-		}
 
 		for (auto &bub_pos : bubbles_positions)
-		{
-			// distance_between_points(player_position, bub_pos);
 			if (glm::distance(player_position, bub_pos) < 0.15)
 			{
-				printf("gratuluje przegranej\n");
+				printf("Przegrałeś :(\n");
 				exit(EXIT_SUCCESS);
 			}
-		}
 		if (is_point_still_in_aquarium(new_player_position))
 			player_position = new_player_position;
+
+		if (player_position.x > 1.9) //next level
+		{
+			bubblesSpawnRate += 0.1;
+			if (bubblesSpawnRate > 0.8)
+			{
+				printf("Wygrana! :D\n");
+				exit(EXIT_SUCCESS);
+			}
+			player_position = glm::vec3(-2.0, 1.0, 0.0);
+			just_bubbles.setBuffers(bubblesSpawnRate);
+			printf("Next level\n");
+		}
 
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		{
 			first_person_view = !first_person_view;
 		}
-		// Swap buffers
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		WaitForFixedFPS(1000.0 / 60.0);
-	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
-		   glfwWindowShouldClose(window) == 0);
+	} while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
+			 glfwWindowShouldClose(window) == 0);
 
 	glfwTerminate();
-
-	// return 0;
 }
 int main(int argc, char *argv[])
 {

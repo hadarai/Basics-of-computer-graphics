@@ -6,17 +6,17 @@ uniform vec3 viewPosition;
 out vec4 Color;
 
 in vec3 fragmentColor;
-//wazne tu:
+
 in vec3 normalVector; // Normal
 in vec3 fragmentPosition; //fragPos
 // in vec3 lightPos;
 
 void main()
 {
-    // ((gl_InstanceID % 50) / 50)
     vec3 bubbleColor = vec3(0.63, 0.83, 0.96);
     vec3 upperLightColor = vec3(1.0, 1.0, 1.0);
     vec3 playerLightColor = vec3(0.804, 0.945, 0.386);
+    vec3 waterAbsorb = vec3(2.0, 1.0, 0.1);
     
     float upperAmbientStrength = 0.1;
     float playerAmbientStrength = 0.1;
@@ -29,8 +29,8 @@ void main()
 
     float diffPl = max(dot(norm, playerLightDir), 0.0);
     float diffUp = max(dot(norm, upperLightDir), 0.0);
-    float strDistDependendPlayer = (1/ (distance(playerLightPosition, fragmentPosition)/10))/15;
-    float strDistDependendUpper = (1/ (distance(upperLightPosition, fragmentPosition)/10))/5;
+    float strDistDependendPlayer = min((1/ (distance(playerLightPosition, fragmentPosition)/10))/15, 1.0);
+    float strDistDependendUpper = min((1/ (distance(upperLightPosition, fragmentPosition)/10))/5, 1.0);
     vec3 diffuse = diffPl * playerLightColor * strDistDependendPlayer + diffUp * upperLightColor * strDistDependendUpper;
     
     float playerSpecularStrength = 0.4;
@@ -44,6 +44,11 @@ void main()
     vec3 specular = playerSpecularStrength * specPl * playerLightColor + upperSpecularStrength * specUp * upperLightColor;  
 
     vec3 result = (playerAmbient + upperAmbient + diffuse + specular) * bubbleColor;
+    
+    float strDistDependendView = min(((distance(viewPosition, fragmentPosition)/10))/15, 1.0);
+    vec3 absorb = exp(-waterAbsorb * strDistDependendView);
+    result *= absorb;
+    
     Color = vec4(result, 1.0);
     // Color.a = 0.3;
 }

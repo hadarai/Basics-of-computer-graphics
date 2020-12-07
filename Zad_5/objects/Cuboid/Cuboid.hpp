@@ -34,9 +34,6 @@ public:
             0, 1, 2,
             1, 2, 3,
 
-            // 4, 6, 5,
-            // 6, 5, 7,
-
             0, 1, 4,
             1, 4, 5,
 
@@ -103,9 +100,7 @@ private:
     GLuint ViewPositionID;
 
     GLuint vertexbuffer;
-    // GLuint colorbuffer;
 
     GLuint elementbuffer;
     std::vector<unsigned int> indices;
-    // kind of something
 };

@@ -14,9 +14,6 @@ using namespace glm;
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
-// position
-// glm::vec3 position = glm::vec3(-0.9, 0.9, 0.9);
-// horizontal angle : toward -Z
 float horizontalAngle = 3.14f / 2; //
 // vertical angle : 0, look at the horizon
 // float verticalAngle = 13 * 3.14f / 90;
@@ -24,7 +21,7 @@ float verticalAngle = 0;
 // Initial Field of View
 float initialFoV = 45.0f;
 
-float speed = 3.0f; // 3 units / second
+float speed = 2.0f; // 2 units / second
 float mouseSpeed = 0.0005f;
 
 glm::mat4 getViewMatrix(void)
@@ -112,11 +109,11 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     {
-        new_player_position.y += 0.05;
+        new_player_position.y += (speed / 100);
     }
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
     {
-        new_player_position.y -= 0.05;
+        new_player_position.y -= (speed / 100);
     }
 
     return new_player_position;
@@ -167,39 +164,37 @@ glm::vec3 computeViewMatrices(glm::vec3 &position, GLFWwindow *window)
         camera_position + direction, // and looks here : at the same position, plus "direction"
         up                           // Head is up (set to 0,-1,0 to look upside-down)
     );
-    // printf("Kamera jest na: (%f, %f, %f)\n", position.x, position.y, position.z);
-    // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
 
     glm::vec3 new_player_position = position;
-    float lookUpSpeed = 0.01;
+    // float lookUpSpeed = 0.01;
     // Move forward
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        new_player_position.x += lookUpSpeed;
-    }
-    // Move backward
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        new_player_position.x -= lookUpSpeed;
-    }
-    // Strafe right
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        new_player_position.z += lookUpSpeed;
-    }
-    // Strafe left
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        new_player_position.z -= lookUpSpeed;
+        new_player_position.x += (speed / 100);
+    }
+    // Move backward
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        new_player_position.x -= (speed / 100);
+    }
+    // Strafe right
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        new_player_position.z += (speed / 100);
+    }
+    // Strafe left
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        new_player_position.z -= (speed / 100);
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     {
-        new_player_position.y += lookUpSpeed;
+        new_player_position.y += (speed / 100);
     }
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
     {
-        new_player_position.y -= lookUpSpeed;
+        new_player_position.y -= (speed / 100);
     }
 
     return new_player_position;

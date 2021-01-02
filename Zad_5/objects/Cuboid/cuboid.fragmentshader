@@ -46,7 +46,6 @@ void main(){
 
 
     float strDistDependendView = min(( (distance(viewPosition, fragmentPosition)/10))/15, 1.0);
-        
     vec3 absorb = exp(-waterAbsorb * strDistDependendView);
     result *= absorb;
     

@@ -1,14 +1,9 @@
 class MapTile
 {
 public:
-    MapTile(std::vector<short> *height_map, float offset)
+    MapTile(std::vector<short> *height_map, glm::vec2 offset)
     {
         setShaders();
-
-        glGenVertexArrays(1, &RectangleVAO);
-        glGenBuffers(1, &vertexbuffer);
-        glGenBuffers(1, &elementbuffer);
-
         setBuffers(height_map, offset);
     }
     void setShaders()
@@ -16,16 +11,23 @@ public:
         ProgramID = LoadShaders("objects/MapTile/maptile.vertexshader", "objects/MapTile/maptile.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
-    void setBuffers(std::vector<short> *height_map, float offset)
+    void genBuffers(void)
     {
+        glGenVertexArrays(1, &RectangleVAO);
+        glGenBuffers(1, &vertexbuffer);
+        glGenBuffers(1, &elementbuffer);
+    }
+    void setBuffers(std::vector<short> *height_map, glm::vec2 offset)
+    {
+        genBuffers();
         GLfloat *g_vertex_buffer_data = (GLfloat *)malloc(g_vertex_buffer_data_size);
-        tile_middle = glm::vec3(offset + 0.5, offset + 0.5, 0.0f);
+        tile_middle = glm::vec3(offset.x + 0.5f, offset.y + 0.5f, 0.0f);
         int ilosc_wierszy_mapy = SRTM_SIZE;
         int ilosc_kolumn_mapy = SRTM_SIZE;
         int szerokosc_wiersza = SRTM_SIZE * 3;
         int g_vertex_buffer_data_index = 0;
-        printf("OTRZYMALEM %ld ELEMENTÓW\n", height_map->size());
-        // exit(EXIT_SUCCESS);
+        // printf("OTRZYMALEM %ld ELEMENTÓW\n", height_map->size());
+
         for (int i = 0; i < ilosc_wierszy_mapy; i++) //iteruje sie 1201 razy
         {
             // if (i > 1200)
@@ -33,11 +35,6 @@ public:
             // g_vertex_buffer_data_index = 0;
             for (int j = 0; j < ilosc_kolumn_mapy; j++) //iteruje sie 1201 razy
             {
-                // printf("%d ", g_vertex_buffer_data_index);
-                // if (i > 1200 || j > 3600)
-                //     break;
-                // int current_index = i * szerokosc_wiersza + j;
-
                 g_vertex_buffer_data[g_vertex_buffer_data_index] = (GLfloat)i / SRTM_SIZE;     //To jest X ofc
                 g_vertex_buffer_data[g_vertex_buffer_data_index + 1] = (GLfloat)j / SRTM_SIZE; //To jest Y, bo przeciez to mapa scienna.
                                                                                                // if (g_vertex_buffer_data_index / 3 < height_map->size())
@@ -63,32 +60,13 @@ public:
                 //        (GLfloat)(*height_map)[current_index]);
                 //    0.0f);
 
-                g_vertex_buffer_data[g_vertex_buffer_data_index + 0] += offset;
-                g_vertex_buffer_data[g_vertex_buffer_data_index + 1] += offset;
+                g_vertex_buffer_data[g_vertex_buffer_data_index + 0] += offset.x;
+                g_vertex_buffer_data[g_vertex_buffer_data_index + 1] += offset.y;
 
                 g_vertex_buffer_data_index = g_vertex_buffer_data_index + 3;
             }
             // printf("\n");
         }
-        // exit(EXIT_SUCCESS);
-
-        // for (unsigned int i = 0; i < SRTM_SIZE * SRTM_SIZE; i = i + 2) //powinno byc i++
-        // {
-        //     if (i % (SRTM_SIZE - 1) == 0)
-        //     {
-        //         printf("pomijam");
-        //         continue;
-        //     }
-
-        //     indices.push_back(i);
-        //     indices.push_back(i + 1);
-        //     indices.push_back(i + SRTM_SIZE);
-
-        //     indices.push_back(i + 1);
-        //     indices.push_back(i + SRTM_SIZE);
-        //     indices.push_back(i + SRTM_SIZE + 1);
-        //     // printf("Triangle (%d, %d, %d) generated\n", i, i + 1, i + 2);
-        // }
 
         for (unsigned int i = 0; i < SRTM_SIZE - 1; i++)
         {
@@ -141,7 +119,7 @@ public:
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_lod0.size() * sizeof(unsigned int), &indices_lod0[0], GL_STATIC_DRAW);
-        Errors("DUPA26");
+        // Errors("DUPA26");
 
         free(g_vertex_buffer_data);
         glEnableVertexAttribArray(0);

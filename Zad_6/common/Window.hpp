@@ -31,7 +31,8 @@ public:
     virtual void MousePosCB(double xp, double yp);
 
     void MainLoop(void);
-    std::vector<short> ReadData(std::string filepath);
+    void ReadData(void);
+    std::vector<short> ReadFile(std::string filepath);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
 
@@ -49,6 +50,11 @@ private:
     std::array<GLFWmonitor *, 2> monitors = {nullptr, nullptr}; // first and last m.
 
     double prev_time = 0.0; // for fixed FPS
+
+    // std::vector<MapTile> map_data;
+    // std::vector<std::vector<std::vector<short>>> map_data;
+
+    std::vector<short> map_data[60][180];
 
     static void CallbackResize(GLFWwindow *window, int cx, int cy);
     static void CallbackKey(GLFWwindow *window, int key, int scancode, int action, int mods);

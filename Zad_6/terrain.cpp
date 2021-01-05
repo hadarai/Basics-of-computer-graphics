@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <fstream>
+#include <iostream>
 #include <iterator>
 #include <string>
 
@@ -29,20 +30,92 @@ using namespace glm;
 Window main_window;
 
 char *data_folder_name;
-
 int latitude_from;
 int latitude_to;
 int longitude_from;
 int longitude_to;
 
-std::vector<short> Window::ReadData(std::string filepath)
+void Window::ReadData(void)
+{
+	printf("powalone\n");
+	// map_data.reserve(latitude_to - latitude_from);
+	// for (auto elem : map_data)
+	// 	elem.reserve(longitude_to - longitude_from);
+	printf("powaloone2\n");
+	for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
+	{
+		for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
+		{
+			// printf("Ogarniam teraz: N%d E%d\n", current_latitude, current_longitude);
+			char filename[100];
+			char latitude_text[4];
+			char longitude_text[5];
+			latitude_text[3] = 0;
+			longitude_text[4] = 0;
+			if (current_latitude > 0)
+				latitude_text[0] = 'N';
+			else
+				latitude_text[0] = 'S';
+			// printf("dupa1");
+			if (current_longitude > 0)
+				longitude_text[0] = 'E';
+			else
+				longitude_text[0] = 'W';
+			// printf("dupa2");
+			if (current_latitude < 10)
+			{
+				latitude_text[1] = '0';
+				// printf("\nLITERKA: %c\n", '0' + current_latitude);
+				latitude_text[2] = '0' + current_latitude;
+			}
+			else
+			{
+				latitude_text[1] = '0' + (current_latitude / 10);
+				latitude_text[2] = '0' + (current_latitude % 10);
+			}
+			// printf("dupa3");
+			if (current_longitude < 10)
+			{
+				longitude_text[1] = '0';
+				longitude_text[2] = '0';
+				longitude_text[3] = '0' + (current_longitude);
+			}
+			else if (current_longitude < 100)
+			{
+				longitude_text[1] = '0';
+				longitude_text[2] = '0' + (current_longitude / 10);
+				longitude_text[3] = '0' + (current_longitude % 10);
+			}
+			else
+			{
+				longitude_text[1] = '0' + (current_longitude / 100);
+				longitude_text[2] = '0' + ((current_longitude / 10) % 10);
+				longitude_text[3] = '0' + (current_longitude % 10);
+			}
+			std::snprintf(filename, 100, "%s%s%s.hgt", data_folder_name, latitude_text, longitude_text);
+			printf("dupa1\n");
+			// printf("Czytam: %s\n\n", filename);
+
+			map_data[current_latitude][current_longitude] = ReadFile(filename);
+			printf("dupa2\n");
+		}
+	}
+}
+std::vector<short> Window::ReadFile(std::string filepath)
 // short height[SRTM_SIZE][SRTM_SIZE] Window::ReadData(std::string filepath)
 {
+
 	std::ifstream input(filepath, std::ios::binary);
 	// copies all data into buffer
 	std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-	printf("%ld\n", buffer.size() / SRTM_SIZE);
 	std::vector<short> heights;
+	if (buffer.size() == 0)
+	{
+		std::cout << "Error reading file: " << filepath << "\n";
+		return heights;
+	}
+	std::cout << "Read: " << filepath << "\n";
+	// printf("%ld\n", buffer.size() / SRTM_SIZE);
 	for (int i = 0; i < buffer.size(); i = i + 2)
 	{
 		short val = (buffer[i] << 8) | buffer[i + 1];
@@ -52,7 +125,7 @@ std::vector<short> Window::ReadData(std::string filepath)
 	// {
 	// 	printf("%hd ", heights[i]);
 	// }
-	printf("Rozmiar bufora: %ld\nPrzeczytałem %ld danych\n", buffer.size(), heights.size());
+	// printf("Rozmiar bufora: %ld\nPrzeczytałem %ld danych\n", buffer.size(), heights.size());
 	return heights;
 }
 
@@ -65,9 +138,18 @@ void Window::MainLoop()
 
 	glm::vec3 player_position = glm::vec3(0.0, 0.0, 3.0);
 	// glm::vec3 new_player_position;
+	// std::vector<std::vector<MapTile>> whole_map;
+	// for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
+	// {
+	// 	for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
+	// 	{
+	// 		MapTile temp_awful(&(map_data[current_latitude][current_longitude]), glm::vec2(current_latitude, current_longitude));
+	// 		whole_map[current_latitude][current_longitude] = temp_awful;
+	// 	}
+	// }
 
-	std::vector<short> first_tile_data = ReadData("data/N50E016.hgt");
-	std::vector<short> second_tile_data = ReadData("data/N45E006.hgt");
+	std::vector<short> first_tile_data = ReadFile("data/N50E016.hgt");
+	std::vector<short> second_tile_data = ReadFile("data/N45E006.hgt");
 
 	// for (int i = 0; i < SRTM_SIZE; i++)
 	// {
@@ -80,9 +162,14 @@ void Window::MainLoop()
 	// 	printf("\n");
 	// }
 	// exit(EXIT_SUCCESS);
+	// for (auto elem : map_data[51][128])
+	// {
+	// 	std::cout << elem;
+	// }
 
-	MapTile first_tile(&first_tile_data, 0.0f);
-	MapTile second_tile(&second_tile_data, 1.0f);
+	MapTile tile_test(&map_data[51][128], glm::vec2(2.0f, 0.0f));
+	MapTile first_tile(&first_tile_data, glm::vec2(0.0f, 0.0f));
+	MapTile second_tile(&second_tile_data, glm::vec2(1.0f, 0.0f));
 	// flat_map.setShaders();
 	// flat_map.setBuffers(&height_map);
 
@@ -90,7 +177,7 @@ void Window::MainLoop()
 	glm::mat4 ViewMatrix;
 	glm::mat4 ModelMatrix;
 	glm::mat4 MVP_first_view;
-	printf("\nPATRZENIE\n\n");
+	printf("\nShowing Data\n");
 	do
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,11 +192,12 @@ void Window::MainLoop()
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = player_position;
 
-		Errors("przed rysowaniem");
+		// Errors("przed rysowaniem");
 
 		// printf("Teraz jestem na (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z);
 
 		// earth.draw(MVP_first_view, player_position, viewPosition);
+		tile_test.draw(MVP_first_view, player_position);
 		first_tile.draw(MVP_first_view, player_position);
 		second_tile.draw(MVP_first_view, player_position);
 		Errors("po rysowaniu");
@@ -124,7 +212,7 @@ void Window::MainLoop()
 }
 int main(int argc, char *argv[])
 {
-	printf("I got: %d arguments\n", argc);
+	// printf("I got: %d arguments\n", argc);
 	// exit(EXIT_SUCCESS);
 	if (argc != 8)
 	{
@@ -147,11 +235,12 @@ int main(int argc, char *argv[])
 	longitude_to = atoi(argv[7]);
 	// }
 
-	printf("I got that I should print data from: %s\n", data_folder_name);
-	printf("with latitude starting at: %d and ending with: %d\n", latitude_from, latitude_to);
-	printf("with longitude starting at: %d and ending with: %d\n", longitude_from, longitude_to);
+	// printf("I got that I should print data from: %s\n", data_folder_name);
+	// printf("with latitude starting at: %d and ending with: %d\n", latitude_from, latitude_to);
+	// printf("with longitude starting at: %d and ending with: %d\n", longitude_from, longitude_to);
 
 	main_window.Init(1280, 720, "Terrain", 0, 33);
+	main_window.ReadData();
 	main_window.MainLoop();
 	return 0;
 }

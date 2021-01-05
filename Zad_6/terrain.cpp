@@ -24,7 +24,7 @@ using namespace glm;
 #include <common/Window.hpp>
 
 #include "objects/Sphere/Sphere.hpp"
-#include "objects/Rectangle/Rectangle.hpp"
+#include "objects/MapTile/MapTile.hpp"
 
 Window main_window;
 
@@ -81,8 +81,8 @@ void Window::MainLoop()
 	// }
 	// exit(EXIT_SUCCESS);
 
-	Rectangle first_tile_map(&first_tile_data, 0.0f);
-	Rectangle second_tile_map(&second_tile_data, 1.0f);
+	MapTile first_tile(&first_tile_data, 0.0f);
+	MapTile second_tile(&second_tile_data, 1.0f);
 	// flat_map.setShaders();
 	// flat_map.setBuffers(&height_map);
 
@@ -110,8 +110,8 @@ void Window::MainLoop()
 		// printf("Teraz jestem na (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z);
 
 		// earth.draw(MVP_first_view, player_position, viewPosition);
-		first_tile_map.draw(MVP_first_view, player_position);
-		second_tile_map.draw(MVP_first_view, player_position);
+		first_tile.draw(MVP_first_view, player_position);
+		second_tile.draw(MVP_first_view, player_position);
 		Errors("po rysowaniu");
 
 		glfwSwapBuffers(window);

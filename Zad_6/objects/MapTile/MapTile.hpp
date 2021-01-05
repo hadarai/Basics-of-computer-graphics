@@ -1,7 +1,7 @@
-class Rectangle
+class MapTile
 {
 public:
-    Rectangle(std::vector<short> *height_map, float offset)
+    MapTile(std::vector<short> *height_map, float offset)
     {
         setShaders();
 
@@ -13,7 +13,7 @@ public:
     }
     void setShaders()
     {
-        ProgramID = LoadShaders("objects/Rectangle/rectangle.vertexshader", "objects/Rectangle/rectangle.fragmentshader");
+        ProgramID = LoadShaders("objects/MapTile/maptile.vertexshader", "objects/MapTile/maptile.fragmentshader");
         MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
     void setBuffers(std::vector<short> *height_map, float offset)
@@ -196,7 +196,7 @@ public:
                 GL_UNSIGNED_INT,     // type
                 (void *)0            // element array buffer offset
             );
-            printf("a bardzo\n");
+            // printf("a bardzo\n");
         }
 
         else if (distance > 1.0f && distance < 5.0f)
@@ -208,7 +208,7 @@ public:
                 GL_UNSIGNED_INT,     // type
                 (void *)0            // element array buffer offset
             );
-            printf("a średnio\n");
+            // printf("a średnio\n");
         }
 
         else
@@ -220,7 +220,7 @@ public:
                 GL_UNSIGNED_INT,     // type
                 (void *)0            // element array buffer offset
             );
-            printf("a mało\n");
+            // printf("a mało\n");
         }
 
         // glDisableVertexAttribArray(0);

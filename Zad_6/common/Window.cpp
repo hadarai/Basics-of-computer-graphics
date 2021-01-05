@@ -11,8 +11,19 @@ using namespace std;
 void Errors(const char *comment)
 {
     GLenum er;
+
+    bool raised = false;
     while (er = glGetError())
+    {
         fprintf(stderr, "\nOpenGL ERROR: 0x%04x    =============%s===\n", er, comment);
+        raised = true;
+    }
+
+    if (raised)
+        exit(EXIT_FAILURE);
+    // GLenum er;
+    // while (er = glGetError())
+    //     fprintf(stderr, "\nOpenGL ERROR: 0x%04x    =============%s===\n", er, comment);
 }
 
 float Window::Viewport(int _vtx, int _vty, int _vwd, int _vht)
@@ -56,8 +67,8 @@ void Window::KeyCB(int key, int scancode, int action, int mods)
     }
 }
 
-// void Window::MouseButtonCB(int button, int action, int mods) {}
-// void Window::MousePosCB(double xp, double yp) {}
+void Window::MouseButtonCB(int button, int action, int mods) {}
+void Window::MousePosCB(double xp, double yp) {}
 
 void Window::WaitForFixedFPS(float frame_time)
 {

@@ -27,10 +27,11 @@ public:
     virtual void Resize(int _wd, int _ht); // Sets Win:wd,ht,aspec +glViewp
     virtual void KeyCB(int key, int scancode, int action, int mods);
 
-    // virtual void MouseButtonCB(int button, int action, int mods);
-    // virtual void MousePosCB(double xp, double yp);
+    virtual void MouseButtonCB(int button, int action, int mods);
+    virtual void MousePosCB(double xp, double yp);
 
     void MainLoop(void);
+    std::vector<short> ReadData(std::string filepath);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
 

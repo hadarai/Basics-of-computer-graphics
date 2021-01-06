@@ -29,6 +29,7 @@ public:
         // printf("OTRZYMALEM %ld ELEMENTÓW\n", height_map->size());
 
         for (int i = 0; i < ilosc_wierszy_mapy; i++) //iteruje sie 1201 razy
+        // for (int i = ilosc_wierszy_mapy - 1; i >= 0; i--) //iteruje sie 1201 razy
         {
             // if (i > 1200)
             //     break;
@@ -197,7 +198,7 @@ public:
             // printf("a bardzo\n");
         }
 
-        else if (distance > 1.0f && distance < 5.0f)
+        else if (distance > 1.0f && distance < 1.5f)
         {
             bindBuffers(1);
             glDrawElements(
@@ -208,7 +209,7 @@ public:
             );
             // printf("a średnio\n");
         }
-        else if (distance > 5.0f && distance < 10.0f)
+        else if (distance > 1.5f && distance < 5.0f)
         {
             bindBuffers(2);
             glDrawElements(

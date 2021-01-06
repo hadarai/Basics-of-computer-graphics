@@ -73,31 +73,32 @@ void Window::ReadData(void)
 				latitude_text[1] = '0' + (current_latitude / 10);
 				latitude_text[2] = '0' + (current_latitude % 10);
 			}
+			short current_correct_longitude = abs(current_longitude);
 			// printf("dupa3");
-			if (current_longitude < 10)
+			if (current_correct_longitude < 10)
 			{
 				longitude_text[1] = '0';
 				longitude_text[2] = '0';
-				longitude_text[3] = '0' + (current_longitude);
+				longitude_text[3] = '0' + (current_correct_longitude);
 			}
-			else if (current_longitude < 100)
+			else if (current_correct_longitude < 100)
 			{
 				longitude_text[1] = '0';
-				longitude_text[2] = '0' + (current_longitude / 10);
-				longitude_text[3] = '0' + (current_longitude % 10);
+				longitude_text[2] = '0' + (current_correct_longitude / 10);
+				longitude_text[3] = '0' + (current_correct_longitude % 10);
 			}
 			else
 			{
-				longitude_text[1] = '0' + (current_longitude / 100);
-				longitude_text[2] = '0' + ((current_longitude / 10) % 10);
-				longitude_text[3] = '0' + (current_longitude % 10);
+				longitude_text[1] = '0' + (current_correct_longitude / 100);
+				longitude_text[2] = '0' + ((current_correct_longitude / 10) % 10);
+				longitude_text[3] = '0' + (current_correct_longitude % 10);
 			}
 			std::snprintf(filename, 100, "%s%s%s.hgt", data_folder_name, latitude_text, longitude_text);
 			// printf("dupa1\n");
 			// printf("Czytam: %s\n\n", filename);
 
-			map_data[current_latitude][current_longitude] = ReadFile(filename);
-			// printf("dupa2\n");
+			// Tutaj longitude może mieć wartość -28, a w tablicy to adres -28 + 360/2 = 152, gdzie dla -180 jest 0, a dla 0 jest 180
+			map_data[current_latitude][current_longitude + MAX_LONGITUDE / 2] = ReadFile(filename);
 		}
 	}
 }
@@ -136,54 +137,23 @@ void Window::MainLoop()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::vec3 player_position = glm::vec3((GLfloat)latitude_from, (GLfloat)longitude_from, 3.0);
-	// glm::vec3 new_player_position;
-	// std::vector<std::vector<MapTile>> whole_map;
-	// for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
-	// {
-	// 	for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
-	// 	{
-	// 		MapTile temp_awful(&(map_data[current_latitude][current_longitude]), glm::vec2(current_latitude, current_longitude));
-	// 		whole_map[current_latitude][current_longitude] = temp_awful;
-	// 	}
-	// }
+	glm::vec3 player_position = glm::vec3((GLfloat)(MAX_LATITUDE - latitude_from), (GLfloat)longitude_from, 3.0);
 
-	// std::vector<short> first_tile_data = ReadFile("data/N50E016.hgt");
-	// std::vector<short> second_tile_data = ReadFile("data/N45E006.hgt");
-
-	// for (int i = 0; i < SRTM_SIZE; i++)
-	// {
-	// 	printf("%d: ", i);
-	// 	for (int j = 0; j < SRTM_SIZE; j++)
-	// 	{
-	// 		printf("%d, ", height_map[i * SRTM_SIZE + j]);
-	// 		/* code */
-	// 	}
-	// 	printf("\n");
-	// }
-	// exit(EXIT_SUCCESS);
-	// for (auto elem : map_data[51][128])
-	// {
-	// 	std::cout << elem;
-	// }
 	std::vector<MapTile> all_map_tiles;
 	for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
 	{
 		for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
 		{
-			if (!map_data[current_latitude][current_longitude].empty())
+			if (!map_data[current_latitude][current_longitude + MAX_LONGITUDE / 2].empty())
 			{
-				MapTile current_tile(&map_data[current_latitude][current_longitude], glm::vec2((GLfloat)current_latitude, (GLfloat)current_longitude));
+				MapTile current_tile(
+					&map_data[current_latitude][current_longitude + MAX_LONGITUDE / 2],
+					glm::vec2((GLfloat)(MAX_LATITUDE - current_latitude), (GLfloat)current_longitude));
 				all_map_tiles.push_back(current_tile);
 			}
 			printf("Obrobiltem teraz (%d, %d)\n", current_latitude, current_longitude);
 		}
 	}
-	// MapTile tile_test(&map_data[51][128], glm::vec2(2.0f, 0.0f));
-	// MapTile first_tile(&first_tile_data, glm::vec2(0.0f, 0.0f));
-	// MapTile second_tile(&second_tile_data, glm::vec2(1.0f, 0.0f));
-	// flat_map.setShaders();
-	// flat_map.setBuffers(&height_map);
 
 	glm::mat4 ProjectionMatrix;
 	glm::mat4 ViewMatrix;

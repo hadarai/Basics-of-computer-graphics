@@ -34,6 +34,7 @@ public:
             //     break;
             // g_vertex_buffer_data_index = 0;
             for (int j = 0; j < ilosc_kolumn_mapy; j++) //iteruje sie 1201 razy
+            // for (int j = ilosc_kolumn_mapy - 1; j >= 0; j--) //iteruje sie 1201 razy
             {
                 g_vertex_buffer_data[g_vertex_buffer_data_index] = (GLfloat)i / SRTM_SIZE;     //To jest X ofc
                 g_vertex_buffer_data[g_vertex_buffer_data_index + 1] = (GLfloat)j / SRTM_SIZE; //To jest Y, bo przeciez to mapa scienna.
@@ -67,48 +68,64 @@ public:
             }
             // printf("\n");
         }
-
-        for (unsigned int i = 0; i < SRTM_SIZE - 1; i++)
+        unsigned const short lod0 = 1;
+        unsigned const short lod1 = 2;
+        unsigned const short lod2 = 4;
+        unsigned const short lod3 = 10;
+        for (unsigned int i = 0; i < SRTM_SIZE - 1; i += lod0)
         {
-            for (unsigned int j = 0; j < SRTM_SIZE - 1; j++)
+            for (unsigned int j = 0; j < SRTM_SIZE - 1; j += lod0)
             {
                 int index = i * SRTM_SIZE + j;
                 indices_lod0.push_back(index);
-                indices_lod0.push_back(index + 1);
+                indices_lod0.push_back(index + lod0);
                 indices_lod0.push_back(index + SRTM_SIZE);
 
-                indices_lod0.push_back(index + 1);
+                indices_lod0.push_back(index + lod0);
                 indices_lod0.push_back(index + SRTM_SIZE);
-                indices_lod0.push_back(index + SRTM_SIZE + 1);
+                indices_lod0.push_back(index + SRTM_SIZE + lod0);
             }
         }
-        for (unsigned int i = 0; i < SRTM_SIZE - 1; i = i + 2)
+        for (unsigned int i = 0; i < SRTM_SIZE - 1; i = i + lod1)
         {
-            for (unsigned int j = 0; j < SRTM_SIZE - 1; j = j + 2)
+            for (unsigned int j = 0; j < SRTM_SIZE - 1; j = j + lod1)
             {
                 int index = i * SRTM_SIZE + j;
                 indices_lod1.push_back(index);
-                indices_lod1.push_back(index + 2);
-                indices_lod1.push_back(index + SRTM_SIZE * 2);
+                indices_lod1.push_back(index + lod1);
+                indices_lod1.push_back(index + SRTM_SIZE * lod1);
 
-                indices_lod1.push_back(index + 2);
-                indices_lod1.push_back(index + SRTM_SIZE * 2);
-                indices_lod1.push_back(index + SRTM_SIZE * 2 + 2);
+                indices_lod1.push_back(index + lod1);
+                indices_lod1.push_back(index + SRTM_SIZE * lod1);
+                indices_lod1.push_back(index + SRTM_SIZE * lod1 + lod1);
             }
         }
-
-        for (unsigned int i = 0; i < SRTM_SIZE - 1; i = i + 4)
+        for (unsigned int i = 0; i < SRTM_SIZE - 1; i = i + lod2)
         {
-            for (unsigned int j = 0; j < SRTM_SIZE - 1; j = j + 4)
+            for (unsigned int j = 0; j < SRTM_SIZE - 1; j = j + lod2)
             {
                 int index = i * SRTM_SIZE + j;
                 indices_lod2.push_back(index);
-                indices_lod2.push_back(index + 4);
-                indices_lod2.push_back(index + SRTM_SIZE * 4);
+                indices_lod2.push_back(index + lod2);
+                indices_lod2.push_back(index + SRTM_SIZE * lod2);
 
-                indices_lod2.push_back(index + 4);
-                indices_lod2.push_back(index + SRTM_SIZE * 4);
-                indices_lod2.push_back(index + SRTM_SIZE * 4 + 4);
+                indices_lod2.push_back(index + lod2);
+                indices_lod2.push_back(index + SRTM_SIZE * lod2);
+                indices_lod2.push_back(index + SRTM_SIZE * lod2 + lod2);
+            }
+        }
+        for (unsigned int i = 0; i < SRTM_SIZE - 1; i = i + lod3)
+        {
+            for (unsigned int j = 0; j < SRTM_SIZE - 1; j = j + lod3)
+            {
+                int index = i * SRTM_SIZE + j;
+                indices_lod3.push_back(index);
+                indices_lod3.push_back(index + lod3);
+                indices_lod3.push_back(index + SRTM_SIZE * lod3);
+
+                indices_lod3.push_back(index + lod3);
+                indices_lod3.push_back(index + SRTM_SIZE * lod3);
+                indices_lod3.push_back(index + SRTM_SIZE * lod3 + lod3);
             }
         }
 
@@ -151,6 +168,9 @@ public:
         case 2:
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_lod2.size() * sizeof(unsigned int), &indices_lod2[0], GL_STATIC_DRAW);
             break;
+        case 3:
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_lod3.size() * sizeof(unsigned int), &indices_lod3[0], GL_STATIC_DRAW);
+            break;
         default:
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_lod0.size() * sizeof(unsigned int), &indices_lod0[0], GL_STATIC_DRAW);
             break;
@@ -188,13 +208,23 @@ public:
             );
             // printf("a średnio\n");
         }
-
-        else
+        else if (distance > 5.0f && distance < 10.0f)
         {
             bindBuffers(2);
             glDrawElements(
                 GL_TRIANGLES,        // mode
                 indices_lod2.size(), // count
+                GL_UNSIGNED_INT,     // type
+                (void *)0            // element array buffer offset
+            );
+            // printf("a średnio\n");
+        }
+        else
+        {
+            bindBuffers(3);
+            glDrawElements(
+                GL_TRIANGLES,        // mode
+                indices_lod3.size(), // count
                 GL_UNSIGNED_INT,     // type
                 (void *)0            // element array buffer offset
             );
@@ -219,4 +249,5 @@ private:
     std::vector<unsigned int> indices_lod0;
     std::vector<unsigned int> indices_lod1;
     std::vector<unsigned int> indices_lod2;
+    std::vector<unsigned int> indices_lod3;
 };

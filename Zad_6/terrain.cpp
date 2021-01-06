@@ -37,11 +37,11 @@ int longitude_to;
 
 void Window::ReadData(void)
 {
-	printf("powalone\n");
+	// printf("powalone\n");
 	// map_data.reserve(latitude_to - latitude_from);
 	// for (auto elem : map_data)
 	// 	elem.reserve(longitude_to - longitude_from);
-	printf("powaloone2\n");
+	// printf("powaloone2\n");
 	for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
 	{
 		for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
@@ -93,11 +93,11 @@ void Window::ReadData(void)
 				longitude_text[3] = '0' + (current_longitude % 10);
 			}
 			std::snprintf(filename, 100, "%s%s%s.hgt", data_folder_name, latitude_text, longitude_text);
-			printf("dupa1\n");
+			// printf("dupa1\n");
 			// printf("Czytam: %s\n\n", filename);
 
 			map_data[current_latitude][current_longitude] = ReadFile(filename);
-			printf("dupa2\n");
+			// printf("dupa2\n");
 		}
 	}
 }
@@ -136,7 +136,7 @@ void Window::MainLoop()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::vec3 player_position = glm::vec3(0.0, 0.0, 3.0);
+	glm::vec3 player_position = glm::vec3((GLfloat)latitude_from, (GLfloat)longitude_from, 3.0);
 	// glm::vec3 new_player_position;
 	// std::vector<std::vector<MapTile>> whole_map;
 	// for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
@@ -148,8 +148,8 @@ void Window::MainLoop()
 	// 	}
 	// }
 
-	std::vector<short> first_tile_data = ReadFile("data/N50E016.hgt");
-	std::vector<short> second_tile_data = ReadFile("data/N45E006.hgt");
+	// std::vector<short> first_tile_data = ReadFile("data/N50E016.hgt");
+	// std::vector<short> second_tile_data = ReadFile("data/N45E006.hgt");
 
 	// for (int i = 0; i < SRTM_SIZE; i++)
 	// {
@@ -166,10 +166,22 @@ void Window::MainLoop()
 	// {
 	// 	std::cout << elem;
 	// }
-
-	MapTile tile_test(&map_data[51][128], glm::vec2(2.0f, 0.0f));
-	MapTile first_tile(&first_tile_data, glm::vec2(0.0f, 0.0f));
-	MapTile second_tile(&second_tile_data, glm::vec2(1.0f, 0.0f));
+	std::vector<MapTile> all_map_tiles;
+	for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
+	{
+		for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
+		{
+			if (!map_data[current_latitude][current_longitude].empty())
+			{
+				MapTile current_tile(&map_data[current_latitude][current_longitude], glm::vec2((GLfloat)current_latitude, (GLfloat)current_longitude));
+				all_map_tiles.push_back(current_tile);
+			}
+			printf("Obrobiltem teraz (%d, %d)\n", current_latitude, current_longitude);
+		}
+	}
+	// MapTile tile_test(&map_data[51][128], glm::vec2(2.0f, 0.0f));
+	// MapTile first_tile(&first_tile_data, glm::vec2(0.0f, 0.0f));
+	// MapTile second_tile(&second_tile_data, glm::vec2(1.0f, 0.0f));
 	// flat_map.setShaders();
 	// flat_map.setBuffers(&height_map);
 
@@ -197,9 +209,13 @@ void Window::MainLoop()
 		// printf("Teraz jestem na (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z);
 
 		// earth.draw(MVP_first_view, player_position, viewPosition);
-		tile_test.draw(MVP_first_view, player_position);
-		first_tile.draw(MVP_first_view, player_position);
-		second_tile.draw(MVP_first_view, player_position);
+		// tile_test.draw(MVP_first_view, player_position);
+		for (auto curr_tile : all_map_tiles)
+		{
+			curr_tile.draw(MVP_first_view, player_position);
+		}
+		// first_tile.draw(MVP_first_view, player_position);
+		// second_tile.draw(MVP_first_view, player_position);
 		Errors("po rysowaniu");
 
 		glfwSwapBuffers(window);

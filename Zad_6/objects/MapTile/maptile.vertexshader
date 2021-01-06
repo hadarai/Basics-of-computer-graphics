@@ -3,12 +3,12 @@
 layout(location = 0) in vec3 vertexPosition_modelspace;
 uniform mat4 MVP;
 
-out vec3 vertexPosition;
+out float vertexHeight;
 
 void main(){	
 
 	float scale = 1.0;
-	vertexPosition = vertexPosition_modelspace;
+	vertexHeight = vertexPosition_modelspace.z;
 	gl_Position =  MVP * vec4(vertexPosition_modelspace * scale,1);
 
 }

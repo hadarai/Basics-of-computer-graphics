@@ -37,11 +37,6 @@ int longitude_to;
 
 void Window::ReadData(void)
 {
-	// printf("powalone\n");
-	// map_data.reserve(latitude_to - latitude_from);
-	// for (auto elem : map_data)
-	// 	elem.reserve(longitude_to - longitude_from);
-	// printf("powaloone2\n");
 	for (int current_latitude = latitude_from; current_latitude <= latitude_to; current_latitude++)
 	{
 		for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++)
@@ -122,10 +117,6 @@ std::vector<short> Window::ReadFile(std::string filepath)
 		short val = (buffer[i] << 8) | buffer[i + 1];
 		heights.push_back(val);
 	}
-	// for (int i = 0; i < heights.size(); i++)
-	// {
-	// 	printf("%hd ", heights[i]);
-	// }
 	// printf("Rozmiar bufora: %ld\nPrzeczytałem %ld danych\n", buffer.size(), heights.size());
 	return heights;
 }
@@ -151,7 +142,7 @@ void Window::MainLoop()
 					glm::vec2((GLfloat)(MAX_LATITUDE - current_latitude), (GLfloat)current_longitude));
 				all_map_tiles.push_back(current_tile);
 			}
-			printf("Obrobiltem teraz (%d, %d)\n", current_latitude, current_longitude);
+			printf("Processing tile: (%d, %d)\n", current_latitude, current_longitude);
 		}
 	}
 
@@ -173,10 +164,6 @@ void Window::MainLoop()
 
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = player_position;
-
-		// Errors("przed rysowaniem");
-
-		// printf("Teraz jestem na (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z);
 
 		// earth.draw(MVP_first_view, player_position, viewPosition);
 		// tile_test.draw(MVP_first_view, player_position);

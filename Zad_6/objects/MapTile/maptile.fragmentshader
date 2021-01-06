@@ -2,14 +2,14 @@
 
 out vec4 Color;
 
-in vec3 vertexPosition;
+in float vertexHeight;
 
 void main(){
 
     Color = vec4(0.0, 1.0, 0.0, 1.0);
 
     vec3 partial_color;
-    float ht = vertexPosition.z * 9000;
+    float ht = vertexHeight * 9000;
     if      (ht < 0  )   partial_color = vec3(0.,       0.,        1.); //blue
     else if (ht < 500)   partial_color = vec3(0.,       ht/500,    0.); //->green
     else if (ht < 1000)  partial_color = vec3(ht/500-1, 1.,        0.); //->yellow

@@ -70,9 +70,9 @@ public:
             // printf("\n");
         }
         unsigned const short lod0 = 1;
-        unsigned const short lod1 = 2;
-        unsigned const short lod2 = 4;
-        unsigned const short lod3 = 10;
+        unsigned const short lod1 = 4;
+        unsigned const short lod2 = 8;
+        unsigned const short lod3 = 16;
         for (unsigned int i = 0; i < SRTM_SIZE - 1; i += lod0)
         {
             for (unsigned int j = 0; j < SRTM_SIZE - 1; j += lod0)

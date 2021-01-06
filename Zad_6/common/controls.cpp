@@ -23,8 +23,9 @@ float initialFoV = 45.0f;
 
 float speed = 2.0f; // 2 units / second
 float mouseSpeed = 0.0005f;
-
-glm::mat4 getViewMatrix(void)
+bool camera_mode = false;
+glm::mat4
+getViewMatrix(void)
 {
     return ViewMatrix;
 }
@@ -45,7 +46,7 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     double currentTime = glfwGetTime();
     float deltaTime = float(currentTime - lastTime);
 
-    if (false) //toggle camera movement?
+    if (camera_mode) //toggle camera movement?
     {
         // Get mouse position
         double xpos, ypos;
@@ -74,7 +75,8 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
 
     // Up vector
     glm::vec3 up = glm::cross(right, direction);
-    up = glm::cross(up, direction);
+    // if (!camera_mode)
+    //     up = glm::cross(up, direction);
     // glm::vec3 up = glm::cross(down, direction);
     // glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -95,8 +97,9 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     glm::vec3 new_player_position = position;
 
     // Move forward
-
-    if (false) //toggle camera movement
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+        camera_mode = !camera_mode;
+    if (camera_mode) //toggle camera movement
     {
         // Move forward
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -123,29 +126,31 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     }
     else //here is new movement over map
     {
+        horizontalAngle = -3.14f;
+        verticalAngle = 0;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            new_player_position.x -= (speed / 100);
-        }
+            new_player_position.y += (speed / 50);
+                }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            new_player_position.x += (speed / 100);
+            new_player_position.y -= (speed / 50);
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            new_player_position.y += (speed / 100);
+            new_player_position.x += (speed / 50);
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            new_player_position.y -= (speed / 100);
+            new_player_position.x -= (speed / 50);
         }
         if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && new_player_position.z > 0.0f)
         {
-            new_player_position.z -= (speed / 100);
+            new_player_position.z -= (speed / 50);
         }
         if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && new_player_position.z < 5.0f)
         {
-            new_player_position.z += (speed / 100);
+            new_player_position.z += (speed / 50);
         }
     }
 

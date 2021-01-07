@@ -2,8 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <array>
 
-#define MAX_LATITUDE 90   // obsluguje tylko północną półkulę, inaczej powinno być 180
-#define MAX_LONGITUDE 360 // 180 * 2
+//Obsługuję tylko szerokości na wschód od Londynu
+#define MAX_LONGITUDE 180 // X = [0,180]
+// Obsługuję tylko północną półkulę
+#define MAX_LATITUDE 90 // Y = [0, 90]
 
 void Errors(const char *comment); // Prints  Comment and error
 class Window
@@ -54,10 +56,7 @@ private:
 
     double prev_time = 0.0; // for fixed FPS
 
-    // std::vector<MapTile> map_data;
-    // std::vector<std::vector<std::vector<short>>> map_data;
-
-    std::vector<short> map_data[MAX_LATITUDE][MAX_LONGITUDE]; //
+    std::vector<short> map_data[MAX_LONGITUDE][MAX_LATITUDE];
 
     static void CallbackResize(GLFWwindow *window, int cx, int cy);
     static void CallbackKey(GLFWwindow *window, int key, int scancode, int action, int mods);

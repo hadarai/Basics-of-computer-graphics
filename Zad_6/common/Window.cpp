@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 #include <common/Window.hpp>
 
@@ -21,9 +22,26 @@ void Errors(const char *comment)
 
     if (raised)
         exit(EXIT_FAILURE);
-    // GLenum er;
-    // while (er = glGetError())
-    //     fprintf(stderr, "\nOpenGL ERROR: 0x%04x    =============%s===\n", er, comment);
+}
+
+std::vector<short> Window::ReadFile(std::string filepath)
+{
+    std::ifstream input(filepath, std::ios::binary);
+    // copies all data into buffer
+    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
+    std::vector<short> heights;
+    if (buffer.size() == 0)
+    {
+        std::cout << "Error reading file: " << filepath << "\n";
+        return heights;
+    }
+    std::cout << "Read: " << filepath << "\n";
+    for (int i = 0; i < buffer.size(); i = i + 2)
+    {
+        short val = (buffer[i] << 8) | buffer[i + 1];
+        heights.push_back(val);
+    }
+    return heights;
 }
 
 float Window::Viewport(int _vtx, int _vty, int _vwd, int _vht)

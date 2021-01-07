@@ -23,7 +23,7 @@ float initialFoV = 45.0f;
 
 float speed = 2.0f; // 2 units / second
 float mouseSpeed = 0.0005f;
-bool camera_mode = false;
+bool free_camera_mode = false;
 glm::mat4
 getViewMatrix(void)
 {
@@ -46,7 +46,7 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     double currentTime = glfwGetTime();
     float deltaTime = float(currentTime - lastTime);
 
-    if (camera_mode) //toggle camera movement?
+    if (free_camera_mode) //toggle camera movement?
     {
         // Get mouse position
         double xpos, ypos;
@@ -75,15 +75,11 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
 
     // Up vector
     glm::vec3 up = glm::cross(right, direction);
-    // if (!camera_mode)
-    //     up = glm::cross(up, direction);
-    // glm::vec3 up = glm::cross(down, direction);
-    // glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
 
     float FoV = initialFoV; // - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 
-    // Projection matrix : 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
+    // Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    ProjectionMatrix = glm::perspective(glm::radians(FoV), 1.0f, 0.1f, 100.0f);
     // Camera matrix
     ViewMatrix = glm::lookAt(
         position,             // Camera is here
@@ -97,9 +93,9 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
     glm::vec3 new_player_position = position;
 
     // Move forward
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-        camera_mode = !camera_mode;
-    if (camera_mode) //toggle camera movement
+    // if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+    //     free_camera_mode = !free_camera_mode;
+    if (free_camera_mode) //toggle camera movement
     {
         // Move forward
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -115,13 +111,11 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
             new_player_position += right * deltaTime * speed;
-            // new_player_position += down * deltaTime * speed;
         }
         // Strafe left
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
             new_player_position -= right * deltaTime * speed;
-            // new_player_position -= down * deltaTime * speed;
         }
     }
     else //here is new movement over map
@@ -131,7 +125,7 @@ glm::vec3 computeMatricesFromInputs(glm::vec3 &position, GLFWwindow *window)
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
             new_player_position.y += (speed / 50);
-                }
+        }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
             new_player_position.y -= (speed / 50);

@@ -111,7 +111,7 @@ void Window::MainLoop()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::vec3 player_position = glm::vec3((GLfloat)longitude_from, (GLfloat)latitude_from, 3.0);
+	glm::vec3 player_position = glm::vec3((GLfloat)(longitude_to + longitude_from) / 2, (GLfloat)(latitude_to + latitude_from) / 2, 3.0);
 
 	std::vector<MapTile> all_map_tiles;
 	for (int current_longitude = longitude_from; current_longitude <= longitude_to; current_longitude++) // po longitude = X

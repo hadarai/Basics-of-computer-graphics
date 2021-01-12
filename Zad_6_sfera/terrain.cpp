@@ -116,15 +116,17 @@ void Window::MainLoop()
 
 	glm::vec3 player_position_flat =
 		glm::vec3(
-			(GLfloat)(longitude_from),
-			(GLfloat)(latitude_from),
+			(GLfloat)(longitude_to + longitude_from + 1.0f) / 2.0f,
+			(GLfloat)(latitude_to + latitude_from + 1.0f) / 2.0f,
 			10.0);
+
 	glm::vec3 player_position_sphere =
 		sphere_scale *
 		glm::vec3(
 			(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * cos(radians(player_position_flat.x)),
 			(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * sin(radians(player_position_flat.x)),
 			(RADIUS + player_position_flat.z) * sin(radians(player_position_flat.y)));
+
 	// player_position_sphere = glm::vec3(1.0, 0.0, 0.0);
 	printf("Zaczynam na (%f, %f, %f), czyli (%f, %f, %f)\n",
 		   player_position_flat.x,

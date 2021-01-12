@@ -118,7 +118,7 @@ void Window::MainLoop()
 		glm::vec3(
 			(GLfloat)(longitude_from),
 			(GLfloat)(latitude_from),
-			3.0);
+			10.0);
 	glm::vec3 player_position_sphere =
 		sphere_scale *
 		glm::vec3(

@@ -21,7 +21,7 @@ float initialFoV = 45.0f;
 
 float speed = 2.0f; // 2 units / second
 float mouseSpeed = 0.0005f;
-bool free_camera_mode = false;
+
 glm::mat4 getViewMatrix(void)
 {
     return ViewMatrix;
@@ -82,11 +82,18 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
     // Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     ProjectionMatrix = glm::perspective(glm::radians(FoV), 1.0f, 0.1f, 100.0f);
     // Camera matrix
-    ViewMatrix = glm::lookAt(
-        flat_position,             // Camera is here
-        flat_position + direction, // and looks here : at the same position, plus "direction"
-        up                         // Head is up (set to 0,-1,0 to look upside-down)
-    );
+    if (sphere_mode)
+        ViewMatrix = glm::lookAt(
+            sphere_position,             // Camera is here
+            sphere_position + direction, // and looks here : at the same position, plus "direction"
+            up                           // Head is up (set to 0,-1,0 to look upside-down)
+        );
+    else
+        ViewMatrix = glm::lookAt(
+            flat_position,             // Camera is here
+            flat_position + direction, // and looks here : at the same position, plus "direction"
+            up                         // Head is up (set to 0,-1,0 to look upside-down)
+        );
     // printf("Kamera jest na: (%f, %f, %f)\n", position.x, position.y, position.z);
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;

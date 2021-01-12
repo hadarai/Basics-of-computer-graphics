@@ -31,7 +31,7 @@ int latitude_to;
 int longitude_from;
 int longitude_to;
 const float sphere_scale = 0.1;
-bool sphere_mode = false;
+bool sphere_mode = true;
 bool auto_LoD = true;
 
 #include "objects/MapTile/MapTile.hpp"
@@ -166,34 +166,40 @@ void Window::MainLoop()
 	double last_sphere_change = glfwGetTime();
 	double last_lod_change = glfwGetTime();
 
+	glm::vec3 viewPosition;
 	printf("\nShowing Data\n");
 	do
 	{
-		// printf("Jestem na (%f, %f, %f), czyli (%f, %f, %f)\n",
-		// 	   player_position_flat.x,
-		// 	   player_position_flat.y,
-		// 	   player_position_flat.z,
-		// 	   player_position_sphere.x,
-		// 	   player_position_sphere.y,
-		// 	   player_position_sphere.z);
+
+		printf("Jestem na (%f, %f, %f), czyli (%f, %f, %f)\n",
+			   player_position_flat.x,
+			   player_position_flat.y,
+			   player_position_flat.z,
+			   player_position_sphere.x,
+			   player_position_sphere.y,
+			   player_position_sphere.z);
+		printf("Patrzę z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
 
 		// Measure speed
 		double currentTime = glfwGetTime();
 		fps_amount++;
 		if (currentTime - last_speed_time_check >= 1.0)
 		{
-			printf("FPS: %d | Triangles drawn: %d | LoD level: %d\n", fps_amount, triangles_drawn, current_lod_level);
+			printf("FPS: %d | Triangles drawn: %d | LoD level: %d ", fps_amount, triangles_drawn, current_lod_level);
 			if (auto_LoD)
 			{
 				if (fps_amount < 10 && current_lod_level < 4)
 				{
 					current_lod_level += 1;
+					printf("+");
 				}
 				if (fps_amount > 15 && current_lod_level > 0)
 				{
 					current_lod_level -= 1;
+					printf("-");
 				}
 			}
+			printf("\n");
 			fps_amount = 0;
 			last_speed_time_check += 1.0;
 		}
@@ -213,24 +219,19 @@ void Window::MainLoop()
 		MVP_first_view = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		ViewportOne(0, 0, wd, ht);
+		viewPosition = sphere_mode ? player_position_sphere : player_position_flat;
 
 		triangles_drawn = 0;
 		if (sphere_mode)
-		{
-			glm::vec3 viewPosition = player_position_sphere;
 			for (auto curr_tile : spherical_map_tiles)
 			{
 				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
 			}
-		}
 		else
-		{
-			glm::vec3 viewPosition = player_position_flat;
 			for (auto curr_tile : flat_map_tiles)
 			{
 				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
 			}
-		}
 
 		if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 		{

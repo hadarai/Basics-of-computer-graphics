@@ -1,4 +1,3 @@
-// Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
@@ -8,7 +7,6 @@
 #include <string>
 
 #define SRTM_SIZE 1201
-// #define R 6378
 #define RADIUS 637
 
 // Include GLEW
@@ -34,7 +32,6 @@ int longitude_from;
 int longitude_to;
 const float sphere_scale = 0.1;
 
-#include "objects/Sphere/Sphere.hpp"
 #include "objects/MapTile/MapTile.hpp"
 
 void Window::ReadData(void)
@@ -127,7 +124,6 @@ void Window::MainLoop()
 			(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * sin(radians(player_position_flat.x)),
 			(RADIUS + player_position_flat.z) * sin(radians(player_position_flat.y)));
 
-	// player_position_sphere = glm::vec3(1.0, 0.0, 0.0);
 	printf("Zaczynam na (%f, %f, %f), czyli (%f, %f, %f)\n",
 		   player_position_flat.x,
 		   player_position_flat.y,
@@ -225,9 +221,6 @@ void Window::MainLoop()
 		{
 			triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
 		}
-		// first_tile.draw(MVP_first_view, player_position);
-		// second_tile.draw(MVP_first_view, player_position);
-		// Errors("po rysowaniu");
 
 		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS && current_lod_level < 4)
 			current_lod_level += 1;
@@ -236,7 +229,6 @@ void Window::MainLoop()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		// WaitForFixedFPS(1000.0 / 60.0);
 	} while (glfwGetKey(window, GLFW_KEY_Q) != GLFW_PRESS &&
 			 glfwWindowShouldClose(window) == 0);
 
@@ -244,8 +236,6 @@ void Window::MainLoop()
 }
 int main(int argc, char *argv[])
 {
-	// printf("I got: %d arguments\n", argc);
-	// exit(EXIT_SUCCESS);
 	if (argc != 8)
 	{
 		printf("Wrong arguments.\n");
@@ -256,21 +246,11 @@ int main(int argc, char *argv[])
 
 	data_folder_name = argv[1];
 
-	// if (argv[2] == "-lat")
-	// {
 	latitude_from = atoi(argv[3]);
 	latitude_to = atoi(argv[4]);
-	// }
-	// if (argv[5] == "-lon")
-	// {
 	longitude_from = atoi(argv[6]);
 	longitude_to = atoi(argv[7]);
-	// }
-
-	// printf("I got that I should print data from: %s\n", data_folder_name);
-	// printf("with latitude starting at: %d and ending with: %d\n", latitude_from, latitude_to);
-	// printf("with longitude starting at: %d and ending with: %d\n", longitude_from, longitude_to);
-
+	
 	main_window.Init(1000, 1000, "Terrain", 0, 33);
 	main_window.ReadData();
 	main_window.MainLoop();

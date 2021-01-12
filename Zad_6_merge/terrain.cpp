@@ -224,14 +224,10 @@ void Window::MainLoop()
 		triangles_drawn = 0;
 		if (sphere_mode)
 			for (auto curr_tile : spherical_map_tiles)
-			{
 				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
-			}
 		else
 			for (auto curr_tile : flat_map_tiles)
-			{
 				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
-			}
 
 		if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 		{

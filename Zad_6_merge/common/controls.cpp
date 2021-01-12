@@ -30,7 +30,7 @@ glm::mat4 getProjectionMatrix(void)
 {
     return ProjectionMatrix;
 }
-void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_position, GLFWwindow *window, bool &sphere_mode)
+void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_position, GLFWwindow *window, bool sphere_mode)
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
@@ -73,7 +73,7 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
         cos(horizontalAngle - 3.14f / 2.0f));
 
     // Up vector
-    glm::vec3 up = glm::cross(right, direction);
+    glm::vec3 up = glm::normalize(glm::cross(right, direction));
     if (sphere_mode)
         up = glm::normalize(glm::cross(up, direction));
 

@@ -1,6 +1,8 @@
 Fundamentals Of Computer Graphics - Peter Shirley, Steve Marschner.pdf
 
 *.DS_Store
+*.hgt
+
 # Prerequisites
 *.d
 
@@ -33,3 +35,4 @@ Fundamentals Of Computer Graphics - Peter Shirley, Steve Marschner.pdf
 *.exe
 *.out
 *.app
+

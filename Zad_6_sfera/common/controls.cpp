@@ -1,7 +1,5 @@
 // Include GLFW
 #include <GLFW/glfw3.h>
-// extern GLFWwindow *window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
-// extern Window;
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,8 +21,7 @@ float initialFoV = 45.0f;
 
 float speed = 2.0f; // 2 units / second
 float mouseSpeed = 0.0005f;
-glm::mat4
-getViewMatrix(void)
+glm::mat4 getViewMatrix(void)
 {
     return ViewMatrix;
 }
@@ -58,7 +55,7 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
     verticalAngle -= mouseSpeed * float(side / 2 - xpos);
     horizontalAngle += mouseSpeed * float(side / 2 - ypos);
 
-    printf("horizontal angle: %f, vertical angle: %f\n", horizontalAngle, verticalAngle);
+    // printf("horizontal angle: %f, vertical angle: %f\n", horizontalAngle, verticalAngle);
 
     // Direction : Spherical coordinates to Cartesian coordinates conversion
     glm::vec3 direction(
@@ -112,10 +109,10 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && flat_position.z > 0.0f)
     {
-        flat_position.z -= (speed / 50);
+        flat_position.z -= (speed /5);
     }
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && flat_position.z < 15.0f)
     {
-        flat_position.z += (speed / 50);
+        flat_position.z += (speed /5);
     }
 }

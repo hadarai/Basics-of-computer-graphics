@@ -13,7 +13,7 @@ out float vertexHeight;
 void main(){	
 
 	float scale = 0.1;
-	float radius = 637;
+	float radius = 378;
 	vertexHeight = vertexPosition_modelspace.z;
 
 	vec3 vertexPosition_modelspace_sphere = vec3(

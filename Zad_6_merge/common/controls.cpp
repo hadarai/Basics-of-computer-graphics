@@ -42,7 +42,7 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
     // Compute time difference between current and last frame
     double currentTime = glfwGetTime();
     float deltaTime = float(currentTime - lastTime);
-
+    // Camera setup according to map mode
     if (sphere_mode) //toggle camera movement?
     {
         // Get mouse position
@@ -57,6 +57,11 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
         // verticalAngle += mouseSpeed * float(side / 2 - ypos);
         verticalAngle -= mouseSpeed * float(side / 2 - xpos);
         horizontalAngle += mouseSpeed * float(side / 2 - ypos);
+    }
+    else
+    {
+        horizontalAngle = -3.14f;
+        verticalAngle = 0;
     }
     //printf("horizontal angle: %f, vertical angle: %f\n", horizontalAngle, verticalAngle);
 
@@ -73,35 +78,35 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
         cos(horizontalAngle - 3.14f / 2.0f));
 
     // Up vector
+    glm::vec3 zero = glm::vec3(0.0f);
     glm::vec3 up = glm::normalize(glm::cross(right, direction));
-    if (sphere_mode)
-        up = glm::normalize(glm::cross(up, direction));
 
     float FoV = initialFoV; // - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 
     // Projection matrix : 45 Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    ProjectionMatrix = glm::perspective(glm::radians(FoV), 1.0f, 0.1f, 100.0f);
+    ProjectionMatrix = glm::perspective(glm::radians(FoV), (GLfloat)(width / height), 0.1f, 100.0f);
     // Camera matrix
     if (sphere_mode)
+    {
+        // up = -glm::normalize(zero - sphere_position);
+        up = glm::normalize(glm::cross(up, direction));
         ViewMatrix = glm::lookAt(
-            sphere_position,             // Camera is here
-            sphere_position + direction, // and looks here : at the same position, plus "direction"
-            up                           // Head is up (set to 0,-1,0 to look upside-down)
-        );
+            sphere_position,
+            sphere_position + direction,
+            // glm::vec3(0.0f), // chwilowo ma się patrzeć na (0,0,0) bo to środek ziemii
+            up);
+    }
     else
         ViewMatrix = glm::lookAt(
-            flat_position,             // Camera is here
-            flat_position + direction, // and looks here : at the same position, plus "direction"
-            up                         // Head is up (set to 0,-1,0 to look upside-down)
-        );
+            flat_position,
+            flat_position + direction,
+            up);
     // printf("Kamera jest na: (%f, %f, %f)\n", position.x, position.y, position.z);
     // For the next frame, the "last time" will be "now"
     lastTime = currentTime;
 
     if (!sphere_mode)
     {
-        horizontalAngle = -3.14f;
-        verticalAngle = 0;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
             flat_position.y += (speed / 50);
@@ -127,7 +132,7 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
             flat_position.z += (speed / 50);
         }
     }
-    else
+    else //sphere_mode: ON
     {
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
@@ -145,13 +150,16 @@ void computeMatricesFromInputs(glm::vec3 &flat_position, glm::vec3 &sphere_posit
         {
             flat_position.x -= (speed / 50);
         }
-        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && flat_position.z > 0.0f)
+        // if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && flat_position.z > 0.0f)
+        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
         {
             flat_position.z -= (speed / 5);
         }
-        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && flat_position.z < 15.0f)
+        // if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && flat_position.z < 15.0f)
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
         {
             flat_position.z += (speed / 5);
         }
     }
+    // sphere_position = flat_to_spherical(flat_position);
 }

@@ -1,20 +1,20 @@
 class MapTile
 {
 public:
-    MapTile(std::vector<short> *height_map, glm::vec2 tile_position, bool flat)
+    MapTile(std::vector<short> *height_map, glm::vec2 tile_position, bool flat, glm::vec2 flat_middle_of_tiles)
     {
+        middle_of_tiles = flat_middle_of_tiles;
         setShaders(flat);
         setBuffers(height_map, tile_position);
     }
     void setShaders(bool flat)
     {
         // ProgramID = LoadShaders("objects/MapTileFlat/maptileflat.vertexshader", "objects/MapTileFlat/maptileflat.fragmentshader");
-        if (flat)
-            ProgramID = LoadShaders("objects/MapTile/map_tile_flat.vertexshader", "objects/MapTile/map_tile.fragmentshader");
-        else
-            ProgramID = LoadShaders("objects/MapTile/map_tile_sphere.vertexshader", "objects/MapTile/map_tile.fragmentshader");
-
-        MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
+        ProgramID = LoadShaders(
+            flat ? "objects/MapTile/map_tile_flat.vertexshader" : "objects/MapTile/map_tile_sphere.vertexshader",
+            "objects/MapTile/map_tile.fragmentshader");
+        MatrixID = glGetUniformLocation(ProgramID, "MVP");              //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
+        middleID = glGetUniformLocation(ProgramID, "flat_middle_tile"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
     }
     void genBuffers(void)
     {
@@ -152,6 +152,7 @@ public:
         // Send our transformation to the currently bound shader,
         // in the "MVP" uniform:
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); // umieszcza MVP jako uniform z location = MatrixID
+        glUniform2f(middleID, middle_of_tiles.x, middle_of_tiles.y);
         bindBuffers(which_lod);
         glDrawElements(
             GL_TRIANGLES,                    // mode
@@ -169,8 +170,10 @@ private:
 
     GLuint ProgramID;
     GLuint MatrixID;
+    GLuint middleID;
 
     GLuint vertexbuffer;
+    glm::vec2 middle_of_tiles;
 
     long long g_vertex_buffer_data_size = SRTM_SIZE * SRTM_SIZE * 3 * sizeof(GLfloat);
     GLuint elementbuffer;

@@ -2,6 +2,7 @@
 
 layout(location = 0) in vec3 vertexPosition_modelspace;
 uniform mat4 MVP;
+uniform vec2 flat_middle_tile;
 
 out float vertexHeight;
 
@@ -9,7 +10,9 @@ void main(){
 
 	float scale = 1.0;
 	vertexHeight = vertexPosition_modelspace.z;
-	gl_Position =  MVP * vec4(vertexPosition_modelspace * scale,1);
+	vec3 result = vertexPosition_modelspace;
+	// result.y = result.y * cos(radians(flat_middle_tile.x));
+	gl_Position =  MVP * vec4(result * scale,1);
 
 }
 

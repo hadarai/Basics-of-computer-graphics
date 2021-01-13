@@ -31,8 +31,17 @@ int latitude_to;
 int longitude_from;
 int longitude_to;
 const float sphere_scale = 0.1;
-bool sphere_mode = true;
+bool sphere_mode = false;
 bool auto_LoD = true;
+
+glm::vec3 flat_to_spherical(glm::vec3 flat_coordinates)
+{
+	return sphere_scale *
+		   glm::vec3(
+			   (RADIUS + flat_coordinates.z) * cos(radians(flat_coordinates.y)) * cos(radians(flat_coordinates.x)),
+			   (RADIUS + flat_coordinates.z) * cos(radians(flat_coordinates.y)) * sin(radians(flat_coordinates.x)),
+			   (RADIUS + flat_coordinates.z) * sin(radians(flat_coordinates.y)));
+}
 
 #include "objects/MapTile/MapTile.hpp"
 
@@ -112,19 +121,13 @@ void Window::MainLoop()
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	glm::vec2 flat_middle_of_all_tiles = glm::vec2(
+		(GLfloat)(longitude_to + longitude_from + 1.0f) / 2.0f,
+		(GLfloat)(latitude_to + latitude_from + 1.0f) / 2.0f);
 	glm::vec3 player_position_flat =
-		glm::vec3(
-			(GLfloat)(longitude_to + longitude_from + 1.0f) / 2.0f,
-			(GLfloat)(latitude_to + latitude_from + 1.0f) / 2.0f,
-			3.0);
+		glm::vec3(flat_middle_of_all_tiles, 3.0);
 
-	glm::vec3 player_position_sphere =
-		sphere_scale *
-		glm::vec3(
-			(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * cos(radians(player_position_flat.x)),
-			(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * sin(radians(player_position_flat.x)),
-			(RADIUS + player_position_flat.z) * sin(radians(player_position_flat.y)));
+	glm::vec3 player_position_sphere = flat_to_spherical(player_position_flat);
 	printf("Zaczynam na (%f, %f, %f), czyli (%f, %f, %f)\n",
 		   player_position_flat.x,
 		   player_position_flat.y,
@@ -144,12 +147,14 @@ void Window::MainLoop()
 				MapTile current_flat_tile(
 					&map_data[current_longitude][current_latitude],
 					glm::vec2((GLfloat)(current_longitude), (GLfloat)current_latitude),
-					true);
+					true,
+					flat_middle_of_all_tiles);
 				flat_map_tiles.push_back(current_flat_tile);
 				MapTile current_spherical_tile(
 					&map_data[current_longitude][current_latitude],
 					glm::vec2((GLfloat)(current_longitude), (GLfloat)current_latitude),
-					false);
+					false,
+					flat_middle_of_all_tiles);
 				spherical_map_tiles.push_back(current_spherical_tile);
 			}
 			printf("Processing tile: (%d, %d)\n", current_latitude, current_longitude);
@@ -159,7 +164,7 @@ void Window::MainLoop()
 	glm::mat4 ProjectionMatrix;
 	glm::mat4 ViewMatrix;
 	glm::mat4 ModelMatrix;
-	glm::mat4 MVP_first_view;
+	glm::mat4 MVP;
 	unsigned short current_lod_level = 0, fps_amount = 0, triangles_drawn = 0;
 
 	double last_speed_time_check = glfwGetTime();
@@ -171,16 +176,42 @@ void Window::MainLoop()
 	do
 	{
 
-		printf("Jestem na (%f, %f, %f), czyli (%f, %f, %f)\n",
-			   player_position_flat.x,
-			   player_position_flat.y,
-			   player_position_flat.z,
-			   player_position_sphere.x,
-			   player_position_sphere.y,
-			   player_position_sphere.z);
-		printf("Patrzę z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
+		// printf("Jestem na (%f, %f, %f), czyli (%f, %f, %f)\n",
+		// 	   player_position_flat.x,
+		// 	   player_position_flat.y,
+		// 	   player_position_flat.z,
+		// 	   player_position_sphere.x,
+		// 	   player_position_sphere.y,
+		// 	   player_position_sphere.z);
 
-		// Measure speed
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// computeMatricesFromInputs changes player_position_flat, to I have to update player_position_sphere
+		computeMatricesFromInputs(
+			player_position_flat,
+			player_position_sphere,
+			win(),
+			sphere_mode);
+		player_position_sphere = flat_to_spherical(player_position_flat);
+
+		ProjectionMatrix = getProjectionMatrix();
+		ViewMatrix = getViewMatrix();
+		ModelMatrix = glm::mat4(1.0);
+		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
+		ViewportOne(0, 0, wd, ht);
+		viewPosition = sphere_mode ? player_position_sphere : player_position_flat;
+		printf("Patrzę z (%f, %f, %f), wysokosc: %f\n", viewPosition.x, viewPosition.y, viewPosition.z, player_position_flat.z);
+
+		triangles_drawn = 0;
+		if (sphere_mode)
+			for (auto curr_tile : spherical_map_tiles)
+				triangles_drawn += curr_tile.draw(MVP, current_lod_level);
+		else
+			for (auto curr_tile : flat_map_tiles)
+				triangles_drawn += curr_tile.draw(MVP, current_lod_level);
+
+		// Measure run speed
 		double currentTime = glfwGetTime();
 		fps_amount++;
 		if (currentTime - last_speed_time_check >= 1.0)
@@ -203,32 +234,6 @@ void Window::MainLoop()
 			fps_amount = 0;
 			last_speed_time_check += 1.0;
 		}
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		computeMatricesFromInputs(player_position_flat, player_position_sphere, win(), sphere_mode);
-		player_position_sphere =
-			sphere_scale *
-			glm::vec3(
-				(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * cos(radians(player_position_flat.x)),
-				(RADIUS + player_position_flat.z) * cos(radians(player_position_flat.y)) * sin(radians(player_position_flat.x)),
-				(RADIUS + player_position_flat.z) * sin(radians(player_position_flat.y)));
-		ProjectionMatrix = getProjectionMatrix();
-		ViewMatrix = getViewMatrix();
-		ModelMatrix = glm::mat4(1.0);
-		MVP_first_view = ProjectionMatrix * ViewMatrix * ModelMatrix;
-
-		ViewportOne(0, 0, wd, ht);
-		viewPosition = sphere_mode ? player_position_sphere : player_position_flat;
-
-		triangles_drawn = 0;
-		if (sphere_mode)
-			for (auto curr_tile : spherical_map_tiles)
-				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
-		else
-			for (auto curr_tile : flat_map_tiles)
-				triangles_drawn += curr_tile.draw(MVP_first_view, current_lod_level);
-
 		if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 		{
 			double currentTime = glfwGetTime();
@@ -248,9 +253,15 @@ void Window::MainLoop()
 			if (currentTime - last_sphere_change >= 1.0)
 			{
 				if (sphere_mode)
+				{
 					printf("Flat map\n");
+					player_position_flat.z -= 10;
+				}
 				else
+				{
 					printf("Spherical map\n");
+					player_position_flat.z += 10;
+				}
 				sphere_mode = !sphere_mode;
 				last_sphere_change = glfwGetTime();
 			}

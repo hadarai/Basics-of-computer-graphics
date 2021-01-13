@@ -33,16 +33,24 @@ int longitude_to;
 const float sphere_scale = 0.1;
 bool sphere_mode = false;
 bool auto_LoD = true;
+glm::vec2 flat_middle_of_all_tiles;
 
-glm::vec3 flat_to_spherical(glm::vec3 flat_coordinates)
+glm::vec3
+global_flat_to_spherical(glm::vec3 global_flat_coordinates)
 {
 	return sphere_scale *
 		   glm::vec3(
-			   (RADIUS + flat_coordinates.z) * cos(radians(flat_coordinates.y)) * cos(radians(flat_coordinates.x)),
-			   (RADIUS + flat_coordinates.z) * cos(radians(flat_coordinates.y)) * sin(radians(flat_coordinates.x)),
-			   (RADIUS + flat_coordinates.z) * sin(radians(flat_coordinates.y)));
+			   (RADIUS + global_flat_coordinates.z) * cos(radians(global_flat_coordinates.y)) * cos(radians(global_flat_coordinates.x)),
+			   (RADIUS + global_flat_coordinates.z) * cos(radians(global_flat_coordinates.y)) * sin(radians(global_flat_coordinates.x)),
+			   (RADIUS + global_flat_coordinates.z) * sin(radians(global_flat_coordinates.y)));
 }
-
+glm::vec3 global_flat_to_flat(glm::vec3 global_flat_coordinates)
+{
+	return glm::vec3(
+		global_flat_coordinates.x * cos(radians(flat_middle_of_all_tiles.y)),
+		global_flat_coordinates.y,
+		global_flat_coordinates.z);
+}
 #include "objects/MapTile/MapTile.hpp"
 
 void Window::ReadData(void)
@@ -121,14 +129,18 @@ void Window::MainLoop()
 	glDepthFunc(GL_LESS);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glm::vec2 flat_middle_of_all_tiles = glm::vec2(
+	flat_middle_of_all_tiles = glm::vec2(
 		(GLfloat)(longitude_to + longitude_from + 1.0f) / 2.0f,
 		(GLfloat)(latitude_to + latitude_from + 1.0f) / 2.0f);
-	glm::vec3 player_position_flat =
-		glm::vec3(flat_middle_of_all_tiles, 3.0);
 
-	glm::vec3 player_position_sphere = flat_to_spherical(player_position_flat);
-	printf("Zaczynam na (%f, %f, %f), czyli (%f, %f, %f)\n",
+	glm::vec3 player_global_position_flat = glm::vec3(flat_middle_of_all_tiles, 3.0);
+	glm::vec3 player_position_flat = global_flat_to_flat(player_global_position_flat);
+	glm::vec3 player_position_sphere = global_flat_to_spherical(player_position_flat);
+
+	printf("Zaczynam na global:(%f, %f, %f), flat:(%f, %f, %f), spherical: (%f, %f, %f)\n",
+		   player_global_position_flat.x,
+		   player_global_position_flat.y,
+		   player_global_position_flat.z,
 		   player_position_flat.x,
 		   player_position_flat.y,
 		   player_position_flat.z,
@@ -171,12 +183,15 @@ void Window::MainLoop()
 	double last_sphere_change = glfwGetTime();
 	double last_lod_change = glfwGetTime();
 
-	glm::vec3 viewPosition;
+	glm::vec3 viewPosition = player_position_flat;
 	printf("\nShowing Data\n");
 	do
 	{
 
-		// printf("Jestem na (%f, %f, %f), czyli (%f, %f, %f)\n",
+		// printf("Jestem na global:(%f, %f, %f), flat:(%f, %f, %f), spherical: (%f, %f, %f)\n",
+		// 	   player_global_position_flat.x,
+		// 	   player_global_position_flat.y,
+		// 	   player_global_position_flat.z,
 		// 	   player_position_flat.x,
 		// 	   player_position_flat.y,
 		// 	   player_position_flat.z,
@@ -188,11 +203,24 @@ void Window::MainLoop()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		// computeMatricesFromInputs changes player_position_flat, to I have to update player_position_sphere
 		computeMatricesFromInputs(
+			player_global_position_flat,
 			player_position_flat,
 			player_position_sphere,
 			win(),
-			sphere_mode);
-		player_position_sphere = flat_to_spherical(player_position_flat);
+			sphere_mode,
+			flat_middle_of_all_tiles);
+		player_position_flat = global_flat_to_flat(player_global_position_flat);
+		player_position_sphere = global_flat_to_spherical(player_global_position_flat);
+
+		if (sphere_mode)
+		{
+			viewPosition = player_position_sphere;
+		}
+		else
+		{
+			viewPosition = player_position_flat;
+			// viewPosition.x *= cos(radians(flat_middle_of_all_tiles.y));
+		}
 
 		ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
@@ -200,7 +228,8 @@ void Window::MainLoop()
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		ViewportOne(0, 0, wd, ht);
-		viewPosition = sphere_mode ? player_position_sphere : player_position_flat;
+
+		// viewPosition = sphere_mode ? player_position_sphere : player_position_flat;
 		printf("Patrzę z (%f, %f, %f), wysokosc: %f\n", viewPosition.x, viewPosition.y, viewPosition.z, player_position_flat.z);
 
 		triangles_drawn = 0;

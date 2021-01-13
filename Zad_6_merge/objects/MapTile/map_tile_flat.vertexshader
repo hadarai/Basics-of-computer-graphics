@@ -11,8 +11,7 @@ void main(){
 	float scale = 1.0;
 	vertexHeight = vertexPosition_modelspace.z;
 	vec3 result = vertexPosition_modelspace;
-	// result.y = result.y * cos(radians(flat_middle_tile.x));
+	result.x = result.x * cos(radians(flat_middle_tile.y));
 	gl_Position =  MVP * vec4(result * scale,1);
-
 }
 

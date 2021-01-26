@@ -1,7 +1,6 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <cmath>
 #include <vector>
 
@@ -18,13 +17,16 @@ using namespace glm;
 #include <common/shader.hpp>
 #include <common/controls.hpp>
 #include <common/Window.hpp>
+#include <common/objloader.hpp>
 
 #include "objects/Cuboid/Cuboid.hpp"
 #include "objects/Sphere/Sphere.hpp"
+#include "objects/LoadedObject/LoadedObject.hpp"
 
 Window main_window;
+// FILE *model_file;
 
-void Window::MainLoop()
+void Window::MainLoop(char *model_filepath)
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -34,13 +36,14 @@ void Window::MainLoop()
 	glm::vec3 player_position = glm::vec3(1.0, 1.0, 0.0);
 	glm::vec3 upper_light_position = glm::vec3(0.0, 3.0, 0.0);
 
-	Sphere player_position_representation;
+	// Sphere player_position_representation;
 	Cuboid aquarium_cuboid;
+	LoadedObject viewed_object(model_filepath);
 
 	glm::mat4 ProjectionMatrix;
 	glm::mat4 ViewMatrix;
 	glm::mat4 ModelMatrix;
-	glm::mat4 MVP_first_view;
+	glm::mat4 MVP;
 	do
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -51,13 +54,14 @@ void Window::MainLoop()
 		ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
 		ModelMatrix = glm::mat4(1.0);
-		MVP_first_view = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = player_position;
 
 		// printf("Teraz patrze z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
-		aquarium_cuboid.draw(MVP_first_view, viewPosition, player_position, upper_light_position);
+		// aquarium_cuboid.draw(MVP, viewPosition, player_position, upper_light_position);
+		viewed_object.draw(MVP, player_position, upper_light_position);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -69,26 +73,20 @@ void Window::MainLoop()
 }
 int main(int argc, char *argv[])
 {
-	int seed = time(NULL);
-
+	if (argc < 2)
+	{
+		fprintf(stderr, "Please specify file path.\n");
+		exit(EXIT_FAILURE);
+	}
 	if (argc > 2)
 	{
-		printf("Wrong arguments.");
+		fprintf(stderr, "Too many arguments.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (argc < 2)
-	{
-		printf("Assuming seed: %d\n", seed);
-	}
-	else
-	{
-		seed = atoi(argv[1]);
-		printf("Given seed: %d\n", seed);
-	}
+	char *filepath = argv[1];
 
-	srand(seed);
 	main_window.Init(1280, 720, "Viewer", 0, 33);
-	main_window.MainLoop();
+	main_window.MainLoop(filepath);
 	return 0;
 }

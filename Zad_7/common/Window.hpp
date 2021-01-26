@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <array>
+#include <stdio.h>
 
 void Errors(const char *comment); // Prints  Comment and error
 class Window
@@ -30,7 +31,7 @@ public:
     // virtual void MouseButtonCB(int button, int action, int mods);
     // virtual void MousePosCB(double xp, double yp);
 
-    void MainLoop(void);
+    void MainLoop(char *model_filepath);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
 

@@ -1,0 +1,23 @@
+#version 330 core
+
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 NormalForTriangle;
+uniform mat4 MVP;
+// uniform vec3 lightPosition;  
+uniform vec3 viewPos;
+
+out vec3 fragmentColor;
+
+out vec3 normalVector;
+out vec3 fragmentPosition;
+
+void main(){	
+
+	normalVector = vertexPosition_modelspace;
+	fragmentPosition = vertexPosition_modelspace;
+	// Output position of the vertex, in clip space : MVP * position
+	gl_Position =  MVP * vec4(vertexPosition_modelspace,1);
+
+}
+

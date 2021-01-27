@@ -28,8 +28,8 @@ public:
     virtual void Resize(int _wd, int _ht); // Sets Win:wd,ht,aspec +glViewp
     virtual void KeyCB(int key, int scancode, int action, int mods);
 
-    // virtual void MouseButtonCB(int button, int action, int mods);
-    // virtual void MousePosCB(double xp, double yp);
+    virtual void MouseButtonCB(int button, int action, int mods);
+    virtual void MousePosCB(double xp, double yp);
 
     void MainLoop(char *model_filepath);
 
@@ -52,6 +52,6 @@ private:
 
     static void CallbackResize(GLFWwindow *window, int cx, int cy);
     static void CallbackKey(GLFWwindow *window, int key, int scancode, int action, int mods);
-    // static void CallbackMouseButton(GLFWwindow *window, int button, int action, int mods);
-    // static void CallbackMousePos(GLFWwindow *window, double xp, double yp);
+    static void CallbackMouseButton(GLFWwindow *window, int button, int action, int mods);
+    static void CallbackMousePos(GLFWwindow *window, double xp, double yp);
 };

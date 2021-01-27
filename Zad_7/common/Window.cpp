@@ -33,7 +33,6 @@ float Window::ViewportOne(int _vtx, int _vty, int _vwd, int _vht)
 
 void Window::Resize(int _wd, int _ht)
 {
-
     wd = _wd;
     ht = _ht;
     int side = min(wd, ht);
@@ -56,8 +55,8 @@ void Window::KeyCB(int key, int scancode, int action, int mods)
     }
 }
 
-// void Window::MouseButtonCB(int button, int action, int mods) {}
-// void Window::MousePosCB(double xp, double yp) {}
+void Window::MouseButtonCB(int button, int action, int mods) {}
+void Window::MousePosCB(double xp, double yp) {}
 
 void Window::WaitForFixedFPS(float frame_time)
 {
@@ -135,8 +134,8 @@ void Window::Init(int width, int height, const char *name, int fullscr, int vers
     glfwSetWindowUserPointer(window, this);
     glfwSetWindowSizeCallback(window, Window::CallbackResize);
     glfwSetKeyCallback(window, Window::CallbackKey);
-    // glfwSetMouseButtonCallback(window, Window::CallbackMouseButton);
-    // glfwSetCursorPosCallback(window, Window::CallbackMousePos);
+    glfwSetMouseButtonCallback(window, Window::CallbackMouseButton);
+    glfwSetCursorPosCallback(window, Window::CallbackMousePos);
 
     glfwGetWindowPos(window, &winPos[0], &winPos[1]);
     // Resize() begining:
@@ -145,7 +144,7 @@ void Window::Init(int width, int height, const char *name, int fullscr, int vers
     aspect = float(wd) / ht;
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwPollEvents();
     glfwSetCursorPos(window, width / 2, height / 2);
@@ -167,19 +166,19 @@ void Window::CallbackKey(GLFWwindow *window, int key, int scancode, int action, 
     if (Window *winPtr = static_cast<Window *>(ptr))
         winPtr->KeyCB(key, scancode, action, mods);
 }
-// void Window::CallbackMouseButton(GLFWwindow *window, int button, int action, int mods)
-// {
-//     void *ptr = glfwGetWindowUserPointer(window);
-//     if (Window *winPtr = static_cast<Window *>(ptr))
-//         winPtr->MouseButtonCB(button, action, mods);
-// }
+void Window::CallbackMouseButton(GLFWwindow *window, int button, int action, int mods)
+{
+    void *ptr = glfwGetWindowUserPointer(window);
+    if (Window *winPtr = static_cast<Window *>(ptr))
+        winPtr->MouseButtonCB(button, action, mods);
+}
 
-// void Window::CallbackMousePos(GLFWwindow *window, double xp, double yp)
-// {
-//     void *ptr = glfwGetWindowUserPointer(window);
-//     if (Window *winPtr = static_cast<Window *>(ptr))
-//         winPtr->MousePosCB(xp, yp);
-// }
+void Window::CallbackMousePos(GLFWwindow *window, double xp, double yp)
+{
+    void *ptr = glfwGetWindowUserPointer(window);
+    if (Window *winPtr = static_cast<Window *>(ptr))
+        winPtr->MousePosCB(xp, yp);
+}
 
 bool Window::IsFullScreen(void)
 {

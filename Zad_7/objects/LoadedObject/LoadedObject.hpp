@@ -9,7 +9,7 @@ public:
 
         setShaders();
 
-        glGenVertexArrays(1, &sphereVAO);
+        glGenVertexArrays(1, &objectVAO);
         glGenBuffers(1, &vertexBuffer);
         // glGenBuffers(1, &elementBuffer);
 
@@ -34,7 +34,7 @@ public:
         // GLfloat g_vertex_buffer_data[10];
         // Napełnianie g_vertex_buffer_data i indices
 
-        glBindVertexArray(sphereVAO);
+        glBindVertexArray(objectVAO);
         // for (auto v : vertices)
         // {
         //     printf("(%f, %f, %f)\n", v.x, v.y, v.z);
@@ -51,7 +51,7 @@ public:
 
     void bindBuffers()
     {
-        glBindVertexArray(sphereVAO);
+        glBindVertexArray(objectVAO);
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -91,7 +91,7 @@ private:
     GLuint LightPositionID;
     GLuint ViewPositionID;
 
-    GLuint sphereVAO;
+    GLuint objectVAO;
     GLuint vertexBuffer;
     GLuint colorBuffer;
     // GLuint elementBuffer;

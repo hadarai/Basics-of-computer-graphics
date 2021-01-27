@@ -12,16 +12,17 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/controls.hpp>
 #include <common/Window.hpp>
 #include <common/objloader.hpp>
+// #include <common/texture.hpp>
 
 #include "objects/Cuboid/Cuboid.hpp"
 #include "objects/Sphere/Sphere.hpp"
 #include "objects/LoadedObject/LoadedObject.hpp"
+#include "objects/Axes/Axes.hpp"
 
 Window main_window;
 // FILE *model_file;
@@ -33,12 +34,29 @@ void Window::MainLoop(char *model_filepath)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::vec3 player_position = glm::vec3(1.0, 1.0, 0.0);
+	glm::vec3 player_position = glm::vec3(2.0, 0.0, 2.0);
 	glm::vec3 upper_light_position = glm::vec3(0.0, 3.0, 0.0);
 
-	// Sphere player_position_representation;
-	Cuboid aquarium_cuboid;
+	// GLuint LoadedTextureID = loadBMP(texture_filepath);
 	LoadedObject viewed_object(model_filepath);
+	// if (NULL != texture_filepath)
+	// {
+	// 	GLuint LoadedTextureID = loadBMP(texture_filepath);
+	// 	LoadedObject viewed_object(model_filepath, LoadedTextureID);
+	// }
+	// else
+	// {
+	// 	LoadedObject viewed_object(model_filepath);
+	// }
+	// LoadedObject viewed_object(model_filepath, );
+	// if (NULL != texture_filepath)
+	// {
+	// 	GLuint LoadedTextureID = loadBMP(texture_filepath);
+	// 	viewed_object.setTexture(LoadedTextureID);
+	// }
+	// Sphere player_position_representation;
+	// Cuboid aquarium_cuboid;
+	Axes axes;
 
 	glm::mat4 ProjectionMatrix;
 	glm::mat4 ViewMatrix;
@@ -56,9 +74,13 @@ void Window::MainLoop(char *model_filepath)
 		ModelMatrix = glm::mat4(1.0);
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
+		// int side = std::min(wd, ht);
+		// ViewportOne(0, 0, side, side);
+
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = player_position;
 
+		axes.draw(MVP);
 		// printf("Teraz patrze z (%f, %f, %f)\n", viewPosition.x, viewPosition.y, viewPosition.z);
 		// aquarium_cuboid.draw(MVP, viewPosition, player_position, upper_light_position);
 		viewed_object.draw(MVP, player_position, upper_light_position);
@@ -80,13 +102,26 @@ int main(int argc, char *argv[])
 	}
 	if (argc > 2)
 	{
-		fprintf(stderr, "Too many arguments.\n");
+		fprintf(stderr, "Too many arguments.\nOnly .obj file and texture is needed");
 		exit(EXIT_FAILURE);
 	}
-
-	char *filepath = argv[1];
-
 	main_window.Init(1280, 720, "Viewer", 0, 33);
-	main_window.MainLoop(filepath);
+	char *obj_filepath = argv[1];
+	// char *texture_filepath = argv[2];
+	main_window.MainLoop(obj_filepath);
+
+	// char *obj_filepath = argv[1];
+	// if (argc == 2)
+	// {
+	// 	printf("No texture given. Displaying without.\n");
+	// 	main_window.MainLoop(obj_filepath);
+	// }
+	// else
+	// {
+	// 	printf("Texture given.\n");
+	// 	char *texture_filepath = argv[2];
+	// 	main_window.MainLoop(obj_filepath, texture_filepath);
+	// }
+
 	return 0;
 }

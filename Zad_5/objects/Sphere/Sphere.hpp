@@ -99,7 +99,6 @@ private:
 
     GLuint sphereVAO;
     GLuint vertexBuffer;
-    GLuint colorBuffer;
     GLuint elementBuffer;
 
     std::vector<unsigned short> indices;

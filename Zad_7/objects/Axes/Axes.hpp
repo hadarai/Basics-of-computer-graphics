@@ -18,29 +18,29 @@ public:
     {
 
         static const GLfloat g_vertex_buffer_data[] = {
-            -1000.0f,
+            -200.0f,
             0.0f,
             0.0f,
 
-            1000.0f,
+            200.0f,
             0.0f,
             0.0f,
 
             0.0f,
-            -1000.0f,
+            -200.0f,
             0.0f,
 
             0.0f,
-            1000.0f,
+            200.0f,
             0.0f,
 
             0.0f,
             0.0f,
-            -1000.0f,
+            -200.0f,
 
             0.0f,
             0.0f,
-            1000.0f,
+            200.0f,
         };
 
         glBindVertexArray(axesVAO);

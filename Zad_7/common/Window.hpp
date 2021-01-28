@@ -31,7 +31,7 @@ public:
     virtual void MouseButtonCB(int button, int action, int mods);
     virtual void MousePosCB(double xp, double yp);
 
-    void MainLoop(char *model_filepath);
+    void MainLoop(char *model_filepath, char *texture_filepath);
 
     void WaitForFixedFPS(float frame_time = 1. / 60.); // Use before glfwSwapBuffers()
 

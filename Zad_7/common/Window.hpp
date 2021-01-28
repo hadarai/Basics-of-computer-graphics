@@ -14,7 +14,6 @@ public:
         Init(_wd, _ht, name, vers, fullscr);
     }; // fullscr=1/2 vers=33
     void Init(int _wd, int _ht, const char *name, int fullscr = 0, int vers = 33);
-    // ~AGLWindow();
     GLFWwindow *win() { return window; };
 
     int wd, ht;   // Window dimensions

@@ -17,17 +17,12 @@
 #include <common/controls.hpp>
 #include <common/Window.hpp>
 #include <common/objloader.hpp>
-// #include <common/texture.hpp>
 #include <common/stb_image.cpp>
 
-#include "objects/Cuboid/Cuboid.hpp"
-#include "objects/Sphere/Sphere.hpp"
-#include "objects/Triangle/Triangle.hpp"
 #include "objects/LoadedObject/LoadedObject.hpp"
 #include "objects/Axes/Axes.hpp"
 
 Window main_window;
-// FILE *model_file;
 
 void Window::MainLoop(char *model_filepath, char *texture_filepath)
 {
@@ -41,10 +36,7 @@ void Window::MainLoop(char *model_filepath, char *texture_filepath)
 
 	LoadedObject viewed_object(model_filepath, texture_filepath);
 
-	// Sphere player_position_representation;
-	// Cuboid aquarium_cuboid;
 	Axes axes;
-	// Triangle test_tri;
 
 	glm::mat4 ProjectionMatrix;
 	glm::mat4 ViewMatrix;
@@ -55,22 +47,16 @@ void Window::MainLoop(char *model_filepath, char *texture_filepath)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		computeMatricesFromInputs(player_position, win());
-		// printf("gracz jest: (%f, %f, %f). Gracz bedzie: (%f, %f, %f)\n", player_position.x, player_position.y, player_position.z, new_player_position.x, new_player_position.y, new_player_position.z);
 
 		ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
 		ModelMatrix = glm::mat4(1.0);
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-		// int side = std::min(wd, ht);
-		// ViewportOne(0, 0, side, side);
-
 		ViewportOne(0, 0, wd, ht);
 		glm::vec3 viewPosition = player_position;
 
 		axes.draw(MVP);
-		// test_tri.draw(MVP, player_position);
-
 		viewed_object.draw(MVP, player_position, upper_light_position);
 
 		glfwSwapBuffers(window);
@@ -97,19 +83,6 @@ int main(int argc, char *argv[])
 	char *obj_filepath = argv[1];
 	char *texture_filepath = argv[2];
 	main_window.MainLoop(obj_filepath, texture_filepath);
-
-	// char *obj_filepath = argv[1];
-	// if (argc == 2)
-	// {
-	// 	printf("No texture given. Displaying without.\n");
-	// 	main_window.MainLoop(obj_filepath);
-	// }
-	// else
-	// {
-	// 	printf("Texture given.\n");
-	// 	char *texture_filepath = argv[2];
-	// 	main_window.MainLoop(obj_filepath, texture_filepath);
-	// }
 
 	return 0;
 }

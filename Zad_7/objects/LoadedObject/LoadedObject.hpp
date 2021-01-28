@@ -23,9 +23,7 @@ public:
     void setShaders()
     {
         ProgramID = LoadShaders("objects/LoadedObject/LoadedObject.vertexshader", "objects/LoadedObject/LoadedObject.fragmentshader");
-        MatrixID = glGetUniformLocation(ProgramID, "MVP"); //dowiaduje sie gdzie jest w tym shaderze cos jak MVP
-        // OffsetID = glGetUniformLocation(ProgramID, "offset"); //dowiaduje sie gdzie jest w tym shaderze cos jak Offset
-        // TextureID = glGetUniformLocation(TextureID, "tex");
+        MatrixID = glGetUniformLocation(ProgramID, "MVP");
         LightPositionID = glGetUniformLocation(ProgramID, "lightPosition");
         ViewPositionID = glGetUniformLocation(ProgramID, "viewPosition");
     }
@@ -47,7 +45,6 @@ public:
             temp.normal = normals[i];
             data_packed.push_back(temp);
         }
-        // Napełnianie g_vertex_buffer_data i indices
 
         glBindVertexArray(objectVAO);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -71,8 +68,6 @@ public:
             printf("Failed to load texture\n");
         }
         stbi_image_free(data);
-
-        // glEnableVertexAttribArray(0);
     }
 
     void bindBuffers()
@@ -109,9 +104,6 @@ public:
             sizeof(Vertex),                  // stride
             (void *)offsetof(Vertex, normal) // array buffer offset
         );
-
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
     }
     void draw(glm::mat4 MVP, glm::vec3 view_position, glm::vec3 light_position)
     {
@@ -127,7 +119,6 @@ public:
 private:
     GLuint ProgramID;
     GLuint MatrixID;
-    // GLuint OffsetID;
     GLuint LightPositionID;
     GLuint ViewPositionID;
     GLuint TextureID;
@@ -136,7 +127,7 @@ private:
     GLuint vertexBuffer;
     GLuint colorBuffer;
     GLuint textureBuffer;
-    // GLuint elementBuffer;
+
     int texture_width, texture_height, nrChannels;
 
     std::vector<glm::vec3> vertices;
